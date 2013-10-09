@@ -1,0 +1,35 @@
+body {
+  background-color: $bb-light;
+  color: $bb-dark;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $merriweather;
+}
+
+p {
+  font-family: $merriweather;
+}
+
+.site-footer {
+  background-image: $bb-noise;
+}
+
+// Links.
+
+a {
+  color: $bb-orange;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:visited {
+
+  }
+
+  &:active {
+
+  }
+}
