@@ -1,0 +1,14 @@
+<%# views/layout.erb %>
+<html>
+<head>
+  <title><%= title %></title>
+  <% puts request.inspect %>
+</head>
+<body>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About Me</a></li>
+  </ul>
+  <%= yield %>
+</body>
+</html>

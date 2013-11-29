@@ -1,0 +1,11 @@
+<%# views/posts/dashboard.erb %>
+<h1>Your Bitbooks Dashboard!</h1>
+<ul>
+<% @books.each do |book| %>
+  <li>
+    <h2><%= book.title %>
+    <span>by <%= book.author %></span>
+    </h2>
+  </li>
+<% end %>
+</ul> 

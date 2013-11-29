@@ -1,13 +1,12 @@
-source 'https://rubygems.org'
-
-# Our framework for Logging in w/Github, and setting up a tiny RESTful API for getting book info.
+# Gemfile
+source :rubygems
+ 
 gem "sinatra"
-
-# For PostgreSQL support
-gem "pg"
-
-# To interact with the database
+gem "sqlite3"
 gem "activerecord"
-
-# More tools for interacting with the database
 gem "sinatra-activerecord"
+ 
+group :development do
+  gem "shotgun"
+  gem "tux"
+end
