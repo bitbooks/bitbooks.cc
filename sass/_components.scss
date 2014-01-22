@@ -1,0 +1,25 @@
+// Contains components that are not generic enough to be styleguide items (in _base.scss), but not page specific either.
+
+
+
+// Form Styles
+.form-item {
+  margin-bottom: 1em;
+}
+
+.followup-q {
+  font-size: 0.6em;
+}
+
+input[type=radio] {
+  float: left;
+  margin-right: 6px;
+}
+
+.success {
+  color: green;
+}
+
+.failure {
+  color: red;
+}

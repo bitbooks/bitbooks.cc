@@ -2,3 +2,29 @@
 @import "compass/css3/box-shadow"; // See http://compass-style.org/reference/compass/css3/box_shadow/
 @import "compass/css3/border-radius"; // See http://compass-style.org/reference/compass/css3/border_radius/
 @import "compass/css3/text-shadow";  // See http://compass-style.org/reference/compass/css3/text-shadow/
+@import "compass/css3/images"; // For using "background". See http://compass-style.org/reference/compass/css3/images/
+
+// A mixin for buttons, based on a color and optional size.
+@mixin button($color-top: #eee, $size: false) {
+  // Overrides the gradient & hover state on .btn
+  background-color: $color-top; // Fallback for < ie8.
+  @include background(linear-gradient(top, $color-top, darken($color-top, 10%)));
+  border: 1px solid darken($color-top, 15%);
+  border-radius: 3px;
+  box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.3); // Generic shine for top of button.
+
+  &:hover, &:focus {
+    @include background(linear-gradient(top, lighten($color-top, 5%), $color-top)); // Lightened gradient.
+  }
+
+  &:active {
+    @include background(linear-gradient(top, darken($color-top, 10%), $color-top));
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.3); // Generic dark inner shadow for recessed look.
+    border: 1px solid darken($color-top, 15%); // Same as before... this prevents overrides from original button.
+    border-radius: 3px; // Same as before... this prevents overrides from original button.
+  }
+
+  @if $size != false {
+    // Rules for different sized buttons.
+  }
+}

@@ -1,0 +1,68 @@
+.book-form {
+  .error {
+    input {
+      border: 1px solid red;
+    }
+    .msg {
+      color: red;
+    }
+  }
+
+
+  .form-container {
+    max-width: 530px;
+    margin: 0 auto;
+    background: #fbfbfb;
+    padding: 1px 2em 1em;
+    border: 1px solid #ccc;
+  }
+
+  input[type=text] {
+    width: 100%;
+  }
+
+  .site-url-wrapper {
+    text-align: center;
+  }
+
+  .site-url {
+    font-size: 1.4em;
+  }
+
+  input.url-field {
+    width: 50%;
+    // float: left;
+    margin-right: 2px;
+    padding-right: 4px;
+    text-align: right;
+  }
+
+  .icon-checkmark,
+  .icon-cross {
+    vertical-align: middle;
+    margin-right: 8px;
+    font-size: 20px;
+  }
+
+  .image-invalid {
+    color: red;
+  }
+}
+
+.theme-options {
+  img {
+    border: 8px solid transparent;
+    margin-right: 8px;
+    float: left;
+    &:hover {
+      border: 8px solid $bb-mint;
+    }
+  }
+
+  .highlighted {
+    border: 8px solid $bb-orange;
+    &:hover {
+      border: 8px solid $bb-orange;
+    }
+  }
+}

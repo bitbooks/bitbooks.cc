@@ -1,11 +1,39 @@
 <%# views/posts/dashboard.erb %>
-<h1>Your Bitbooks Dashboard!</h1>
-<ul>
-<% @books.each do |book| %>
-  <li>
-    <h2><%= book.title %>
-    <span>by <%= book.author %></span>
-    </h2>
-  </li>
-<% end %>
-</ul> 
+<section class="main dashboard">
+  <div class="inside">
+ 
+    <%= styled_flash %>
+
+    <h1>Your Bitbooks Dashboard!</h1>
+    <div class="inset-panel">
+      <ul>
+      <% @books.each do |book| %>
+        <li class="book">
+          <div class="book-titlebar clearfix">
+            <a class="btn" href="#"><span class="btn-icon icon-cog"></span>Options</a>
+            <a class="btn" href="/books/<%= book.id %>/edit"><span class="btn-icon icon-pencil"></span>Change Details</a>
+            <a class="btn" href="<%= book.github_url %>"><span class="btn-icon icon-github2"></span>View on Github</a>
+            <a class="btn" href="#"><div class="icon-prose"></div><!--<span class="icon-pencil"></span>-->Edit Book with Prose</a>
+          </div>
+          <div class="book-settings clearfix">
+            <img class="book-cover" src="/uploads/<%= book.cover_image['filename'] %>" />
+            <h2 class="book-title"><%= book.title %></h2>
+            <div class="primary-info">
+              <div class="book-author">by <%= book.author %></div>
+              <div class="book-url"><a href="http://<%= book.subdomain %>.bitbooks.cc">http://<%= book.subdomain %>.bitbooks.cc</a></div>
+            </div>
+            <div class="secondary-info">
+              <div><span>Theme: </span><%= book.theme %></div>
+              <div><span>License: </span><%= book.license %></div>
+              <div><%= delete_book(book.id) %></div>
+            </div>
+          </div>
+          <!-- Add the "edit this book" form here -->
+        </li>
+      <% end %>
+      
+        <li class="add-a-book"><a href="/books/new"><span class="icon-plus"></span>Add a new book-site</a></li>
+      </ul>
+    </div>
+  </div>
+</section>

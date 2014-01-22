@@ -1,7 +1,14 @@
-/* In this file we centralize our Sass imports */
+/**
+ * In this file we centralize our Sass imports
+ * They are listed from most generic to most specific.
+ */
 
 @import "_normalize"; // CSS generated from the normalize project.
 @import "_variables"; // Sass variables for bitbooks.
 @import "_mixins"; // Sass mixins for bitbooks.
-@import "_base"; // Base default styles for bitbooks, for components like headings, lists, tables, etc.
+@import "_base"; // Base default styles for bitbooks, for styleguide components like headings, lists, tables, etc.
+@import "_components"; // Components and styles being used across the site.
+@import "_layout"; // Styles for components in the layout, like header, footer, and otheres being shared across multiple pages.
 @import "_launch"; // Styles used specifically for the bitbooks launch page.
+@import "_book_forms"; // Styles used in the forms for creating and editing books.
+@import "_dashboard"; // Styles used specifically on the user dashboard page.

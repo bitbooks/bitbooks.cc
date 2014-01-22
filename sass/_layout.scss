@@ -1,0 +1,46 @@
+// Specific styles used in the site header, footer, and layout.
+
+section {
+  width: 100%;
+}
+
+.inside {
+  max-width: 1016px;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+// Titlebar
+.titlebar {
+  background-color: #e0e0e0;
+  background-image: -moz-linear-gradient(#fafafa, #e0e0e0);
+  background-image: -webkit-linear-gradient(#fafafa, #e0e0e0);
+  background-image: linear-gradient(#fafafa, #e0e0e0);
+  background-repeat: repeat-x;
+  border-bottom: 1px solid #ccc;
+
+  .logo {
+    float: left;
+  }
+  .titlebar-links {
+    float: right;
+    margin: 0;
+
+    li {
+      display: inline;
+      padding-right: 16px;
+    }
+  }
+}
+
+// Footer
+.site-footer {
+  color: $bb-light;
+  text-align: center;
+  background-image: $bb-noise;
+  background-color: $bb-dark;
+  @include box-shadow(inset 0 12px 12px -12px #222222);
+
+  .inside {
+  }
+}
