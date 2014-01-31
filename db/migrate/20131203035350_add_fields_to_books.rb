@@ -1,11 +1,9 @@
 class AddFieldsToBooks < ActiveRecord::Migration
   def up
-    add_column(:books, :cover_image, :string)
-    add_column(:books, :subdomain, :string)
+    add_column(:books, :url, :string)
   end
 
   def down
-    remove_column(:books, :cover_image)
-    remove_column(:books, :subdomain)
+    remove_column(:books, :url)
   end
 end

@@ -16,11 +16,11 @@
             <a class="btn" href="#"><div class="icon-prose"></div><!--<span class="icon-pencil"></span>-->Edit Book with Prose</a>
           </div>
           <div class="book-settings clearfix">
-            <img class="book-cover" src="/uploads/<%= book.cover_image['filename'] %>" />
+            <img class="book-cover" src="/images/book_covers/book-blue-sm.png" />
             <h2 class="book-title"><%= book.title %></h2>
             <div class="primary-info">
               <div class="book-author">by <%= book.author %></div>
-              <div class="book-url"><a href="http://<%= book.subdomain %>.bitbooks.cc">http://<%= book.subdomain %>.bitbooks.cc</a></div>
+              <div class="book-url"><a href="http://<%= book.url %>">http://<%= book.url %></a></div>
             </div>
             <div class="secondary-info">
               <div><span>Theme: </span><%= book.theme %></div>

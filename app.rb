@@ -64,8 +64,9 @@ end
 get "/dashboard" do
   # Access to this page requires authentication.
   if !authenticated?; authenticate!; end
-
-  @books = unserialize_data(Book.all)
+  
+  # Get all books.
+  @books = Book.all
   # Testing get_github_data()
   # flash[:success] = get_github_data()
   flash[:success] = get_octokit()
@@ -152,69 +153,6 @@ end
 # template where the @post object will have the incomplete data that the 
 # user can modify and resubmit.
 post "/books" do
-
-  # Get the file upload data for processing.
-  # @todo: This image validation needs to happen on the Edit book form as well.
-  pp params
-
-  # Perform validation on the file upload, including:
-  # [X] HTML5 clientside filtering for acception mime types
-  # [ ] Clientside valideation
-  #     [X] Warning message
-  #     [ ] Prevent submission
-  # [X] Check against mime type whitelist
-  # [X] Check against file extension whitelist
-  # Also, for extra protection (perhaps not MVP)
-  # [ ] Resize the image (on the server) and strip metadata (then delete the original image)
-  #     - We need to do this anyway, to prevent monstrous images from being uploaded.
-  # [ ] Rename the file
-
-  if params[:book]['cover_image']
-    # The typical image upload object will look something like this:
-    # {
-    #   "cover_image" => {
-    #     :filename=>"cat.png"
-    #     :name => "book[cover_image]",
-    #     :type => "image/png",
-    #     :tempfile => #<File:/var/folders/3n/3asd/-Tmp-/RackMultipart201-1476-nfw2-0>,
-    #     :head =>  "Content-Disposition: form-data;
-    #                name=\"myfile\";
-    #                filename=\"cat.png\"\r\n
-    #                Content-Type: image/png\r\n",
-    #   }
-    # }   
-
-    # A cover image has been uploaded. Perform serverside validation.
-    file_hash = params[:book]['cover_image']
-    # Only supporting uploads with mime type of GIF, JPEG(s), and PNG.
-    mime_whitelist = ['image/gif', 'image/jpeg', 'image/pjpeg', 'image/png']
-    if !mime_whitelist.include? file_hash[:type]
-      flash[:warning] = "Oops. It looks like your image wasn't a gif, jpeg, or png. Please choose a supported image type."
-      redirect "/books/new"
-    end
-
-    # Only supporting common file extensions of these image types.
-    ext_whitelist = ['.gif', '.jpg', '.jpeg', '.png']
-    extension = File.extname(file_hash[:filename])
-    if !ext_whitelist.include? extension
-      flash[:warning] = "Oops. It looks like your image wasn't a gif, jpeg, or png. Please choose a supported image type."
-      redirect "/books/new"
-    end
-
-    # Write the contents of the upload to our uploads folder.
-    # I may want to abstract this into a method as it grows 
-    File.open('public/uploads/' + file_hash[:filename], "w") do |f|
-      f.write(file_hash[:tempfile].read)
-    end
-
-    # Serialize the file hash as json so it can be saved in the database.
-    params[:book]['cover_image'] = file_hash.to_json
-
-  else
-    # Assign a randomly selected cover image.
-
-  end
-
   # Create book object and save it to the database.
   @book = Book.new(params[:book])
 
@@ -237,7 +175,6 @@ put "/books/:id" do
 
   if @book.update_attributes(params[:book])
     flash[:success] = "Your changes have been made (flash)"
-    @books = unserialize_data(Book.all)
     redirect "/dashboard"
   else
     flash[:info] = "Oops. Something went wrong. Try again."
@@ -262,14 +199,8 @@ delete "/books/:id" do
   # @todo: Ensure that a person can only delete "their books"
   # In other words... turn this into a multi-user system.
 
-  @book_obj = Book.find(params[:id])
-  book_data = unserialize_data(@book_obj)
-
-  # Delete the uploaded book image.
-  path_to_file = 'public/uploads/' + book_data.cover_image['filename']
-  File.delete(path_to_file) if File.exist?(path_to_file)
-
   # Delete the database record for the book.
+  @book_obj = Book.find(params[:id])
   @book_obj.destroy
   flash[:success] = "Bye Bye. Your book site has been deleted."
   redirect "/dashboard"
@@ -278,17 +209,6 @@ end
 ######################################
 # Define Methods for use in our app
 ######################################
-
-def unserialize_data(books)
-  # [*books] allows us to iterate on both single and multiple items so we can unserialize single
-  # book objects or multiple book objects. See http://www.rubyinside.com/21-ruby-tricks-902.html
-  [*books].each do |book|
-    # if !book.cover_image.nil?
-      book.cover_image = JSON.parse(book.cover_image)
-    # end
-  end
-  return books
-end
 
 # This is a test of octokit.
 def get_octokit()

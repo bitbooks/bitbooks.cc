@@ -17,14 +17,6 @@
           </select>
         </div>
         <!-- rest of form -->
-        <div class="form-item"> <!-- Consider breaking this form up into multiple steps if that makes it more digestable... this URL field may be a good first step. -->
-          <label for="site-url">Site URL*:</label><br />
-          <div class="site-url-wrapper"><span class="site-url">http://&nbsp;<input type="text" class="url-field" name="book[subdomain]" id="site-url" placeholder="mysite" required>.bitbooks.cc</span></div><br />
-          <div class="success"><span class="icon-checkmark"></span>A fine choice.</div>
-          <div class="failure"><span class="icon-cross"></span>Whoops. That name's already taken.</div>
-          <div class="msg site-url-msg"></div>
-          <span class="followup-q"><a href="#">What if I want to use my own custom domain?</a></span>
-        </div>
         <div class="form-item">
           <label for="book-title">Book Title*:</label><br />
           <input type="text" id="book-title" name="book[title]" required placeholder="Your Grandma's Guide to Perl" />
@@ -34,12 +26,6 @@
           <label for="author">Author*:</label><br />
           <input type="text" id="author" name="book[author]" required placeholder="Leroy Jenkins" />
           <div class="msg author-msg"></div>
-        </div>
-        <div class="form-item">
-          <label for="cover-image">Cover Image:</label><br />
-          <input type="file" id="cover-image" name="book[cover_image]" class="file" accept="image/gif, image/jpeg, image/pjpeg, image/png" /><br />
-          <span class="followup-q">Accepted file types: JPG, GIF, & PNG. Maximum filesize: 2MB</span>
-          <div class="image-invalid"></div>
         </div>
         <div class="form-item">
           <h4>License</h4>

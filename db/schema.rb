@@ -18,8 +18,7 @@ ActiveRecord::Schema.define(version: 20131203035350) do
     t.string "license"
     t.string "github_url"
     t.string "theme"
-    t.string "cover_image"
-    t.string "subdomain"
+    t.string "url"
   end
 
 end

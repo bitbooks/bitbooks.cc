@@ -23,48 +23,7 @@ $('input.radio').click(function() {
   }
 });
 
-// Client-side form validation.
-//
-// Jquery validation plugin (Currently not working)
-//
-// if (document.getElementById('new-book-form')) {
-//   alert("form is here");
-//   $('new-book-form').validate({
-//     onfocusout: function (element) {
-//       this.element(element);
-//     },
-//     rules: {
-//       'book[github_url]': {
-//         required: true
-//       },
-//       'book[subdomain]': {
-//         required: true
-//       },
-//       'book[title]': {
-//         required: true
-//       },
-//       'book[author]': {
-//         required: true
-//       }
-//     },
-//     messages: {
-//       'book[github_url]': 'You must pick a github project.',
-//       'book[subdomain]': 'This field is required',
-//       'book[title]': 'This field is required',
-//       'book[author]': 'This field is required'
-//     },
-//     //highlight: function(element) {
-//     //  $(element).closest('.control-group').removeClass('success').addClass('error');
-//     //}
-//    });
-// }
-// if (document.getElementById('edit-book-form')) {
-//    $('edit-book-form').validate();
-// }
-
-
 // onblur validation for all required fields.
-
 // If .book-form is on page, set up form validation logic.
 if ($('.book-form').length) {
 
@@ -84,25 +43,6 @@ if ($('.book-form').length) {
       }
     });
   });
-
-  // Custom validation for image field file type. See http://stackoverflow.com/a/4329103/1154642
-  var file = document.getElementById('cover-image');
-  file.onchange = function(e){
-    var ext = this.value.match(/\.([^\.]+)$/)[1];
-    switch(ext) {
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-        // Filetype is allowed. Empty any previously set messages.
-        $('.image-invalid').empty();
-        break;
-      default:
-        $('.image-invalid').empty().append('Oops. That file type is not allowed. Please make another choice.');
-        // This line clears out the loaded file. I think that's a bit confusing, so I'm leaving it off for now.
-        // this.value='';
-    }
-  };
 }
 
 // Behaviors for message boxes.
