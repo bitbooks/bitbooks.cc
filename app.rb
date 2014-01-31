@@ -6,11 +6,13 @@ require "sinatra/activerecord"
 require 'sinatra/flash'
 require 'rest-client'
 require 'json'
+require 'octokit'
 
 # for pretty print debugging
 require 'pp'
 
-# Needed for making persistant messages with the sinatra/flash gem.
+# Needed for making persistant messages with the sinatra/flash gem, and for 
+# preserving github auth tokens across sessions.
 enable :sessions
  
 # Set up the database
@@ -36,9 +38,6 @@ end
 
 CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
 CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
-
-# I don't think this line is needed since we have sessions enabled above.
-# use Rack::Session::Cookie, :secret => rand.to_s()
 
 def authenticated?
   session[:access_token]
@@ -68,7 +67,8 @@ get "/dashboard" do
 
   @books = unserialize_data(Book.all)
   # Testing get_github_data()
-  flash[:success] = get_github_data()
+  # flash[:success] = get_github_data()
+  flash[:success] = get_octokit()
 
   # End test
   erb :"templates/dashboard"
@@ -106,7 +106,9 @@ not_found do
   erb :"templates/404"
 end
 
-# Callback URL for Github Authentication
+# Callback URL for Github Authentication. This gets a github oauth token for me
+# for use in acquiring API data. It's a bit manual and could be replaced with 
+# https://github.com/atmos/sinatra_auth_github, but it works well for now.
 get '/callback' do
   # Get temporary GitHub code...
   session_code = request.env['rack.request.query_hash']['code']
@@ -124,6 +126,9 @@ get '/callback' do
   # }
 
   session[:access_token] = JSON.parse(result)['access_token']
+
+  # Uncomment the line below to get the access token (for fiddling with octokit in tux)
+  # flash[:info] = session[:access_token]
 
   # As soon as anybody authenticates, we kick them to the dashboard.
   redirect '/dashboard'
@@ -285,6 +290,21 @@ def unserialize_data(books)
   return books
 end
 
+# This is a test of octokit.
+def get_octokit()
+  if !authenticated?
+    authenticate!
+  else
+    client = Octokit::Client.new :access_token => session[:access_token]
+    user = client.user
+    user.login # => This should return the github username.
+    client.repository('bryanbraun/writer')
+  end
+end
+
+# This is a helper function for getting API data via REST api calls. A little
+# bit more manual than using octokit. I'll leave it here until I get a more 
+# elegant octokit-based one set up.
 def get_github_data()
   if !authenticated?
     authenticate!
