@@ -8,13 +8,21 @@
     }
   }
 
-
-  .form-container {
-    max-width: 530px;
+  .new-form-container {
+    @extend .container;
+    width: 60%;
     margin: 0 auto;
-    background: #fbfbfb;
-    padding: 1px 2em 1em;
-    border: 1px solid #ccc;
+  }
+
+  .edit-form-container {
+    width: 60%;
+    margin-right: 2%;
+    float: left;
+  }
+
+  .edit-form-content {
+    @extend .container;
+    border-top: none;
   }
 
   input[type=text] {
@@ -43,10 +51,35 @@
     margin-right: 8px;
     font-size: 20px;
   }
+}
 
-  .image-invalid {
-    color: red;
-  }
+.form-label {
+  font-family: $droid-sans;
+  font-weight: bold; 
+}
+
+.license-label {
+  margin-bottom: 4px;
+}
+
+.other-options label {
+  font-style: italic;
+}
+
+#other-license {
+  margin-bottom: 6px;
+}
+
+#other-license-url {
+  width: 100%;
+}
+
+.gh-project {
+  font-family: $droid-sans;
+  font-size: 22px;
+  color: #666;
+  margin: 1.8em 0;
+  text-align: center;
 }
 
 .theme-options {
@@ -57,12 +90,58 @@
     &:hover {
       border: 8px solid $bb-mint;
     }
+    &:nth-child(2n) {
+      margin-right: 0;
+    }
   }
 
   .highlighted {
     border: 8px solid $bb-orange;
     &:hover {
       border: 8px solid $bb-orange;
+    }
+  }
+}
+
+.book-form .settings-titlebar,
+.book-form .edit-form-titlebar {
+  border: 1px solid #ccc;
+  padding: 0 1em;
+}
+
+.settings-container {
+  width: 37%;
+  float: left;
+}
+
+.settings-content {
+  @extend .container;
+  border-top: none;
+  padding: 1px 1em 1em;
+
+  h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: $bb-dark;
+    @include text-shadow(0 1px #fff);
+  }
+}
+
+.settings-change-domain {
+  float: left;
+}
+
+.logout-form {
+  display: inline;
+
+  button {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $bb-orange;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }

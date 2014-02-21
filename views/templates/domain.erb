@@ -1,0 +1,40 @@
+<section class="main book-form custom-domain">
+  <div class="inside">
+
+    <%= styled_flash %>
+
+    <div class="domain-form-container clearfix">
+      <h1 class="domain-title">Add a Custom Domain</h1>
+      <div class="step-box">
+        <span class="step-number">Step 1</span>
+        <h2>Purchase your Domain Name</h2>
+        <p>If you already have one, great!</p><p>If not, you can purchase one from a domain registrar like <a href="http://name.com">Name.com</a>, <a href="http://godaddy.com">GoDaddy</a>, or <a href="http://namecheap.com">Namecheap</a>.</p>
+      </div>
+      <div class="step-box">
+        <span class="step-number">Step 2</span>
+        <h2>Submit your domain below</h2>
+        <form id="domain-form" class="domain-form" action="/books/<%= @book.id %>" method="post" enctype="multipart/form-data" data-url="<%=h @book.domain %>">
+          <div class="form-item">
+            <label>Domain:</label>
+            <input type="text" id="domain" name="book[domain]" required placeholder="example.com" value="<%=h @book.domain %>"/>
+            <div class="msg domain-msg"></div>
+          </div>
+          <div class="form-item">
+            <button id="domain-submit" class="btn btn-primary" type="submit">Submit</button>
+          </div>
+          <div class="received success" style="display: none;">
+            <span>Success! We're setting things up to point at your new domain right now.</span>
+            <button id="undo" class="undo" type="submit">Actually, undo this request</button>
+          </div>
+          <div class="spinner"></div>
+        </form>
+      </div>
+      <div class="step-box">
+        <span class="step-number">Step 3</span>
+        <h2>Set up your DNS Settings</h2>
+        <p>You'll need to manually adjust the DNS settings through your domain name provider.</p><p> For guidance, follow <a href="https://help.github.com/articles/setting-up-a-custom-domain-with-pages#setting-up-dns">these instructions from Github</a>.</p>
+        <div class="next-link"><a href="/my-books">Go to My Books<span class="icon-arrow-right"></span></a></div>
+      </div>
+    </div>
+  </div>
+</section>

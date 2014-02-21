@@ -15,4 +15,7 @@ gem "octokit", "~> 2.0"
 group :development do
   gem "shotgun"
   gem "tux"
+  # For runtime debugging.
+  gem "pry"
+  gem "pry-remote"
 end

@@ -1,7 +1,12 @@
 // Specific styles used in the site header, footer, and layout.
-
 section {
   width: 100%;
+}
+
+.main {
+  .inside {
+    padding-bottom: 100px;
+  }
 }
 
 .inside {
@@ -24,23 +29,73 @@ section {
   }
   .titlebar-links {
     float: right;
-    margin: 0;
+    font-family: $droid-sans;
+    font-size: 14px;
+    margin: 6px 0 0;
 
     li {
       display: inline;
       padding-right: 16px;
     }
   }
+  .inside {
+    padding: 0.5em 1em;
+  }
 }
 
 // Footer
 .site-footer {
-  color: $bb-light;
+  color: #999;
   text-align: center;
-  background-image: $bb-noise;
-  background-color: $bb-dark;
-  @include box-shadow(inset 0 12px 12px -12px #222222);
+  background-color: $bb-light;
+  font-family: $droid-sans;
 
+  // Two-toned border and top padding for the footer.
   .inside {
+    padding-top: 0;
+
+    &:before {
+      margin-bottom: 1em;
+      width: 100%;
+      border-top: 1px solid #d2d2d2;
+      border-bottom: 1px solid #fff;
+    }
   }
+
+  /* not doing this design for now */
+  /*
+  .upper-links,
+  .lower-links {
+    margin: 0 auto;
+  }
+  */
+  
+  .links {
+    font-size: 12px;
+    padding: 0;
+    margin: 0.5em 0;
+    display: inline-block;
+    list-style-type: none;
+
+    li {
+      float: left;
+      padding-left: 16px;
+
+      &:first-child {
+        padding-left: 0;
+      }
+    }
+
+    a {
+      color: #999;
+      text-decoration: underline;
+    }
+  }
+  .left-links {
+    float: left;
+  }
+  .right-links {
+    float: right;
+  }
+
 }

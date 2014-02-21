@@ -10,15 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131203035350) do
+ActiveRecord::Schema.define(version: 20140210010856) do
 
   create_table "books", force: true do |t|
     t.string "title"
     t.string "author"
     t.string "license"
-    t.string "github_url"
+    t.string "gh_full_name"
     t.string "theme"
     t.string "url"
+    t.string "other_license"
+    t.string "other_license_url"
+    t.string "username"
+    t.string "domain"
   end
 
 end

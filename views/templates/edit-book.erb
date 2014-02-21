@@ -1,68 +1,113 @@
 <section class="main book-form edit-book">
-  <div class="inside">
+  <div class="inside clearfix">
 
     <%= styled_flash %>
-    <div class="form-container">
-      <h1>Change Book Details</h1>
-      <form id="edit-book-form" action="/books/<%= @book.id %>" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="_method" value="put" /> 
-
-        <div class="form-item">
-          <h3>Which Github Project contains the content for your book?</h3>
-          <label for="select_element">Github Project*:</label><br />
-          <select name="book[github_url]" id="select_element" required>
-            <option value="http://github.com">Option 1</option>
-            <option value="http://github.com/bryanbraun">Option 2</option>
-            <option value="http://github.com/bryanhirsch">Option 3</option>
-          </select>
-        </div>
-        <!-- rest of form -->
-        <div class="form-item">
-          <label for="book-title">Book Title*:</label><br />
-          <input type="text" id="book-title" name="book[title]" required placeholder="Your Grandma's Guide to Perl" value="<%= @book.title %>" />
-          <div class="msg book-title-msg"></div>
-        </div>
-        <div class="form-item">
-          <label for="author">Author*:</label><br />
-          <input type="text" id="author" name="book[author]" required placeholder="Leroy Jenkins" value="<%= @book.author %>" />
-          <div class="msg author-msg"></div>
-        </div>
-        <div class="form-item">
-          <h4>License</h4>
-          <label for="cc-by">Attribution</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by" value="cc-by" /><br/>
-          <label for="cc-by-nd">Attribution-NoDerivs</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nd" value="cc-by-nd" /><br/>
-          <label for="cc-by-sa">Attribution-ShareAlike</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-sa" value="cc-by-sa" /><br/>
-          <label for="cc-by-nc">Attribution-NonCommercial</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nc" value="cc-by-nc" /><br/>
-          <label for="cc-by-nc-sa">Attribution-NonCommercial-ShareAlike</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nc-sa" value="cc-by-nc-sa" /><br/>
-          <label for="cc-by-nc-nd">Attribution-NonCommercial-NoDerivs</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nc-nd" value="cc-by-nc-nd" /><br/>
-          <label for="other">Other</label>
-          <input type="radio" class="radio" name="book[license]" id="other" value="other" /><br/>
-          <span class="followup-q"><a href="#">How do I know which license to use?</a></span>
-          <div class="other-options" style="display: none;">
-            <label for"other-name">License Name: </label><br />
-            <input type="text" id="other-name" name="book[license]" /><br />
-            <label for"other-url">Link to License: </label><br />
-            <input type="url" id="other-url" name="book[license]"/><br />
-            <span class="followup-q"><a href="#">Can I just release it into the Public Domain?</a></span>
+    <div class="edit-form-container">
+      <div class="edit-form-titlebar">
+        <h2>Change Book Details</h2>
+      </div>
+      <div class="edit-form-content">
+        <form id="edit-book-form" action="/books/<%= @book.id %>" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="_method" value="put" /> 
+          <p class="gh-project"><strong>Project: </strong><%= @book.gh_full_name %></p>
+          <div class="form-item">
+            <label for="book-title" class="form-label">Book Title:<span class="required">*</span></label><br />
+            <input type="text" id="book-title" name="book[title]" required placeholder="Your Grandma's Guide to Perl" value="<%=h @book.title %>" />
+            <div class="msg book-title-msg"></div>
           </div>
-        </div>
-        <div class="form-item theme-options clearfix">
-          <label for="selected-theme">Theme*:</label><br />
-          <img class="highlighted" src="/images/theme-glide-thumb.png" data-value="Glide" />
-          <img src="/images/theme-epsilon-thumb.png" data-value="Epsilon" />
-          <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
-          <input type="hidden" id="selected_theme" name="book[theme]" value="Glide" >
-        </div>
-        <div class="form-item">
-          <input class="btn btn-primary" type="submit" value="Apply Changes" />
-        </div>
-      </form>
+          <div class="form-item">
+            <label for="author" class="form-label">Author:<span class="required">*</span></label><br />
+            <input type="text" id="author" name="book[author]" required placeholder="Leroy Jenkins" value="<%=h @book.author %>" />
+            <div class="msg author-msg"></div>
+          </div>
+          <div class="form-item">
+            <p id="license" class="form-label license-label">License:</p>
+            <label for="cc-by">Attribution</label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by" value="cc-by" <%= @book.license == 'cc-by' ? 'checked' : '' %> /><br/>
+            <label for="cc-by-nd">Attribution-NoDerivs</label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nd" value="cc-by-nd" <%= @book.license == 'cc-by-nd' ? 'checked' : '' %> /><br/>
+            <label for="cc-by-sa">Attribution-ShareAlike</label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-sa" value="cc-by-sa" <%= @book.license == 'cc-by-sa' ? 'checked' : '' %> /><br/>
+            <label for="cc-by-nc">Attribution-NonCommercial</label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nc" value="cc-by-nc" <%= @book.license == 'cc-by-nc' ? 'checked' : '' %> /><br/>
+            <label for="cc-by-nc-sa">Attribution-NonCommercial-ShareAlike</label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nc-sa" value="cc-by-nc-sa" <%= @book.license == 'cc-by-nc-sa' ? 'checked' : '' %> /><br/>
+            <label for="cc-by-nc-nd">Attribution-NonCommercial-NoDerivs</label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nc-nd" value="cc-by-nc-nd" <%= @book.license == 'cc-by-nc-nd' ? 'checked' : '' %> /><br/>
+            <label for="other">Other</label>
+            <input type="radio" class="radio" name="book[license]" id="other" value="Other" <%= @book.license == 'Other' ? 'checked' : '' %> /><br/>
+            <span class="followup-q"><a href="#">How do I know which license to use?</a></span>
+            <div class="other-options" style="<%=h @book.license == 'Other' ? '' : 'display: none;' %>">
+              <label for"other-license">License Name: </label><br />
+              <input type="text" id="other-license" name="book[other_license]" value="<%=h @book.other_license %>"/><br />
+              <label for"other-license-url">Link to License: </label><br />
+              <input type="url" id="other-license-url" name="book[other_license_url]" value="<%=h @book.other_license_url %>"/><br />
+              <span class="followup-q"><a href="#">Can I just release it into the Public Domain?</a></span>
+            </div>
+          </div>
+          <div class="form-item theme-options clearfix">
+            <label for="selected-theme" class="form-label">Theme:<span class="required">*</span></label><br />
+            <img src="/images/theme-glide-thumb.png" data-value="Glide" class="<%= @book.theme == 'Glide' ? 'highlighted' : '' %>" />
+            <img src="/images/theme-epsilon-thumb.png" data-value="Epsilon" class="<%= @book.theme == 'Epsilon' ? 'highlighted' : '' %>" />
+            <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
+            <input type="hidden" id="selected_theme" name="book[theme]" value="<%=h @book.theme %>" >
+          </div>
+          <div class="form-item">
+            <input class="btn btn-primary" type="submit" value="Apply Changes" onclick="checkLicense()" />
+          </div>
+          <small class="required">* Required</small>
+        </form>
+      </div>
+    </div>
+    <div class="settings-container">
+      <div class="settings-titlebar"><h2>Site Options</h2></div>
+      <div class="settings-content">
+        <% if domain_is_custom(@book) %>
+          <h3>Change Custom Domain</h3>
+          <p>You're using the domain <span class="custom-data"><%=h @book.domain %></span>. Change it again, or revert it back to the default path.</p>
+          <div>
+            <a class="btn settings-change-domain" href="/books/<%= @book.id %>/domain"><span class="btn-icon icon-rocket"></span>Change my Domain</a>
+            <form id="domain-revert" class="domain-revert" action="/books/<%= @book.id %>" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="_method" value="put" />
+              <input type="hidden" id="domain" name="book[domain]" value=""/>
+              <input id="domain-submit" class="btn" type="submit" value="Revert Domain" />
+            </form>
+          </div>
+          <p><small>Reverting your domain will make your site accessible at <span class="custom-data"><%= @book.url %></span></small></p>
+        <% else %>
+          <h3>Add a Custom Domain</h3>
+          <p>Configure your site to use your own custom domain name.</p>
+          <a class="btn" href="/books/<%= @book.id %>/domain"><span class="btn-icon icon-rocket"></span>Show me how</a>      
+        <% end %>
+      </div>
+      <!-- This feature is on our list -->
+      <!--
+      <div class="settings-content">
+        <h3>Customize your Theme</h3>
+        <p>Change the look and feel of your site, by uploading your own custom CSS. This will be loaded along with the theme's default styling.</p>
+        <a class="btn" href="#"><span class="btn-icon icon-brush"></span>Upload CSS</a>
+      </div>
+      -->
+      <div class="settings-content">
+        <h3>Download your Site</h3>
+        <p>Download a .zip archive containing a the source of your site.</p>
+        <a class="btn" href="https://github.com/<%= @book.gh_full_name %>/archive/gh-pages.zip"><span class="btn-icon icon-download3"></span>Download</a>
+      </div>
+      <!-- This feature is on our list -->
+      <!--
+      <div class="settings-content">
+        <h3>Print and Sell your Book</h3>
+        <p>You can publish physical copies of your book to be sold through online retailers, and take home the profits!</p>
+        <a class="btn" href="#"><span class="btn-icon icon-book2"></span>Tell me more</a>
+      </div>
+      -->
+      <div class="settings-content">
+        <h3>Delete your Site</h3>
+        <p>Delete your Bitbooks generated site.</p>
+        <p class="warning">Careful! This action cannot be reversed!</p>
+        <div><%= delete_book(@book.id) %></div>
+        <p><small>Clicking this button will delete the gh-pages branch from the <span class="custom-data"><%= @book.gh_full_name %></span> repository, including the site generated by Bitbooks. The master branch will not be deleted.</small></p>
+      </div>
     </div>
   </div>
 </section>

@@ -9,17 +9,17 @@
   <title>Bitbooks | Teaching the world, open-source style.</title>
   <% puts request.inspect %>
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link href='http://fonts.googleapis.com/css?family=Merriweather:400,700' rel='stylesheet' type='text/css'>
   <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
   <header class="titlebar">
     <div class="inside clearfix">
-      <a href="http://bitbooks.cc" class="logo"><img src="/images/bitbooks-titlebar-text.png" /></a>
+      <a href="/" class="logo"><img src="/images/bitbooks-header.png" /></a>
       <ul class="titlebar-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/styleguide">Styleguide</a></li>
+        <% if authenticated? %>
+          <li><a href="/my-books">My Books</a></li>
+        <% end %>
+        <%= login_link %>
       </ul>
     </div>
   </header>
@@ -27,13 +27,20 @@
   <%= yield %>
 
   <footer class="site-footer">
-    <div class="inside">
-      <p>A project by <a href="http://bryanbraun.com">this guy</a>. Questions? <a href="http://bryanbraun.com/contact">Just ask</a>.</p>
+    <div class="inside clearfix">
+        <ul class="links left-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Open Source</a></li>
+          <li><a href="/styleguide">Styleguide</a></li>
+        </ul>
+        <ul class="links right-links">
+          <li>Copyright 2014</li>
+          <li>Made by <a href="http://bryanbraun.com">Bryan</a></li>
+        </ul>
     </div>
   </footer>
   <!-- temporary inclusion of scripts -->
   <script src="//code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
-  <script src="/js/jquery.validate.min.js" type="text/javascript"></script>
   <script src="/js/all.js" type="text/javascript"></script>
 </body>
 </html>

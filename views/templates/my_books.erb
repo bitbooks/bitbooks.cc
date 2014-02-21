@@ -1,0 +1,54 @@
+<%# views/posts/my_books.erb %>
+<section class="main my-books">
+  <div class="inside">
+ 
+    <%= styled_flash %>
+
+    <h1 class="my-books-title">My Books</h1>
+    <div class="inset-panel">
+      <a class="btn btn-contrast add-a-book-main" href="/books/new"><span class="btn-icon icon-plus"></span>Create a new Book</a>
+      <ul>
+      <% [*@books].each do |book| %>
+        <li class="book">
+          <div class="book-titlebar clearfix">
+            <a class="btn" href="/books/<%= book.id %>/edit"><span class="btn-icon icon-cog"></span>Book Settings</a>
+            <!-- <a class="btn" href="/books/<%= book.id %>/edit"><span class="btn-icon icon-pencil"></span>Change Details</a> -->
+            <%# The link to prose doesn't require login, which is currently an issue, because of this bug: https://github.com/prose/prose/issues/643. Once it's fixed, I think the workflow will be ok. %>
+            <a class="btn" href="http://prose.io/#<%=h book.gh_full_name %>"><!--<div class="icon-prose"></div>--><span class="btn-icon icon-pencil"></span>Edit Book with Prose</a>
+          </div>
+          <div class="book-settings clearfix">
+            <div class="book-info clearfix">
+            <a class="book-cover-link" href="<%= link_to_book(book) %>"><img class="book-cover" src="/images/book_covers/book-blue-sm.png" /></a>
+              <div class="primary-info">
+                <h2 class="book-title"><%=h book.title %></h2>
+                <div class="book-author">by <%=h book.author %></div>
+                <div class="book-url">
+                  <span class="label">Site: </span>
+                  <a href="<%= link_to_book(book) %>"><%= link_to_book(book) %></a>
+                </div>
+                <div><span class="label">Theme: </span><%=h book.theme %></div>
+                <div><span class="label">License: </span><%= license_link(book) %></div>
+              </div>
+              <div class="secondary-info">
+                <h3>Github Info:</h3>
+                <div class="project-url">
+                  <a class="label" href="https://github.com/<%=h book.gh_full_name %>"><%= get_repo_name(book.gh_full_name) %></a>
+                </div>
+                  <ul class="repo-stats">
+                    <li><a href="https://github.com/<%=h book.gh_full_name %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name) %></a></li>
+                    <li><a href="https://github.com/<%=h book.gh_full_name %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name) %></a></li>
+                    <li><a href="https://github.com/<%=h book.gh_full_name %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.gh_full_name) %></a></li>
+                    <li><a href="https://github.com/<%=h book.gh_full_name %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.gh_full_name) %></a></li>
+                  </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Add the "edit this book" form here -->
+        </li>
+      <% end %>
+      
+        <li class="add-a-book"><a href="/books/new"><span class="icon-plus"></span>Create a new book</a></li>
+      </ul>
+    </div>
+  </div>
+</section>

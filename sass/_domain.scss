@@ -1,0 +1,74 @@
+// Contains styles for the custom domain page.
+
+.domain-form-container {
+  @extend .container
+}
+.domain-title {
+  margin: 1em 0 1.5em 0;
+}
+.step-box {
+  float: left;
+  width: 33%;
+  padding: 0 2em;
+
+  .success {
+    font-family: $droid-sans;
+    padding: 0.8em 0.8em 0.8em 0.8em;
+    border: 1px solid #5EDB6C;
+    margin: 0 0 1em 0;
+    border-radius: 2px;
+    position: relative;
+    color: #429e4d;
+    background-color: #A4F8Ae;
+    .undo {
+      font-size: 12px;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-top: 1em;
+      text-decoration: underline;
+      color: #429e4d;  
+    }
+  }
+}
+.domain-form {
+  position: relative;
+
+  // Styles applied while the form is processing.
+  &.processing {
+
+    // Show and position spinner. The rest of the spinner CSS
+    // is in _components.scss
+    .spinner {
+      display: block;
+      position: absolute;
+      left: 95px;
+      top: 40px;
+    }
+    .success .undo {
+      text-decoration: none;
+    }
+  }
+
+  .spinner {
+    display: none;
+  }
+
+}
+.step-number {
+  font-size: 30px;
+  color: #aaa;
+}
+.next-link {
+  position: relative;
+  margin-top: 4em;
+  text-align: right;
+  font-family: $droid-sans;
+
+  .icon-arrow-right {
+    font-size: 18px;
+    position: absolute;
+    right: -26px;
+    bottom: 3px;
+  }
+}

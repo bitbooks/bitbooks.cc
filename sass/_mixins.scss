@@ -24,6 +24,13 @@
     border-radius: 3px; // Same as before... this prevents overrides from original button.
   }
 
+  &:disabled {
+    @include background(linear-gradient(top, tint($color-top, 40%), tint($color-top, 20%)));
+    border: 1px solid tint($color-top, 10%);
+    color: $bb-light;
+    text-shadow: none;
+  }
+
   @if $size != false {
     // Rules for different sized buttons.
   }
