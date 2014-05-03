@@ -8,6 +8,8 @@ require 'rest-client'
 require 'json'
 require 'octokit'
 
+
+
 # for pretty print debugging
 require 'pp'
 
@@ -49,6 +51,39 @@ def authenticate!
   redirect '/'
 end
 
+######################################
+# Async Queue setup
+# Example: https://github.com/mperham/sidekiq/blob/master/examples/sinkiq.rb
+######################################
+
+# For this to work ake sure you have Sinatra installed, and redis installed
+# (see http://stackoverflow.com/a/13635955/1154642). Start redis with:
+#
+#   redis-server
+#
+# then start sidekiq with
+#
+#   bundle exec sidekiq -r ./app.rb
+#
+
+$redis = Redis.new
+
+class SinatraWorker
+  include Sidekiq::Worker
+
+  # Define the action that we want the worker to do.
+  # @todo: Password protect this request (stored as an ENV variable)
+  def perform(book_id)
+    # We are sending the book's unique data (the contents of book.yml)
+    # over in a post request. This will be used to build the book.
+    book_info = Book.find(book_id)
+    response = RestClient.post("127.0.0.1:4567/build", {:data => book_info.to_json}, {:content_type => :json, :accept => :json })
+
+    # Throw in a message, for testing purposes.
+    $redis.lpush("sinkiq-example-messages", response)
+  end
+end
+
 
 ######################################
 # Routing Calls
@@ -64,6 +99,21 @@ end
 # About
 get "/about" do
   erb :"templates/about"
+end
+
+# Sidekiq example
+ get "/sidekiq-test" do
+  #binding.remote_pry
+  stats = Sidekiq::Stats.new
+  @failed = stats.failed
+  @processed = stats.processed
+  @messages = $redis.lrange('sinkiq-example-messages', 0, -1)
+  erb :"templates/sidekiq"
+end
+
+post '/sidekiq-test' do
+  SinatraWorker.perform_async params[:msg]
+  redirect to('/sidekiq-test')
 end
 
 # Styleguide
@@ -84,9 +134,16 @@ get "/my-books" do
 
   # Get github data needed for this page.
   client = Octokit::Client.new :access_token => session[:access_token]
+  @gh_data = client
 
   # Get books created by the current user.
   @books = Book.where("username = ?", client.user.login)
+
+  # If this user has no books, send them to the new-book page. (untested)
+  if @books.empty?
+    flash[:info] = "Hi friend! Let's start you out by creating your first book."
+    redirect "/books/new"
+  end
 
   # End test
   erb :"templates/my_books"
@@ -96,6 +153,11 @@ end
 get "/books/new" do
   # Access to this page requires authentication.
   if !authenticated?; authenticate!; end
+
+  # Check if there is already a gh-pages branch. If so, warn the user that this will
+  # overwrite the contents of their gh-pages branch, and have them confirm that they're
+  # ok with that.
+  # @todo, add this check. Actually, I think I want to do this client-side, before the post.
 
   # Get github repo data, and other data for this page.
   client = Octokit::Client.new :access_token => session[:access_token]
@@ -113,7 +175,6 @@ get "/books/:id/edit" do
   # Get github repo data, and other data for this page.
   client = Octokit::Client.new :access_token => session[:access_token]
   gh_username = client.user.login
-  @repos = get_qualifying_repos(client)
   @book = Book.find(params[:id])
   @title = "Change Book Details"
 
@@ -232,24 +293,27 @@ post "/books" do
       params[:book].delete("id")
     end
 
-    # Check if there is already a gh-pages branch. If so, warn the user that this will
-    # overwrite the contents of their gh-pages branch, and have them confirm that they're
-    # ok with that.
-    # @todo, add this check.
-
-    # Assign username to our POST params for submission in the database.
+    # Assign any data we want in our database to our POST params:
     params[:book]["username"] = username
+    params[:book]["github_url"] = "https://github.com/" + full_name
+    params[:book]["github_pages_url"] = "http://" + username.downcase + ".github.io/" + name
+    # License Fields
+    license_choice = params[:book]["license"]
+    unless license_choice.nil? || license_choice == "other"
+      license_info = get_license_info(license_choice)
+      params[:book]["license_name"] = license_info[:name]
+      params[:book]["license_url"] = license_info[:url]
+    end
 
-    # Assign the default url to our POST params. It uses the pattern
-    # http://{username}.github.io/{project}
-    # @todo: test real projects with  Uppercases in the Username/Project and ensure
-    #        this link is still good.
-    params[:book]["url"] = "http://" + username.downcase + ".github.io/" + name;
+    ### Clone example book, if that option was chosen ###
 
     # Create book object and save it to the database.
     @book = Book.new(params[:book])
 
     if @book.save
+      # Queue this book build with sidekiq.
+      SinatraWorker.perform_async(@book.id)
+
       flash[:success] = "Your site has been created."
       redirect "/my-books"
     else
@@ -285,8 +349,9 @@ put "/books/:id" do
   # - id
   # - username
   # - gh_full_name
-  # - url
-  protected_props = ["id","username", "gh_full_name", "url"]
+  # - github_pages_url
+  # - github_url
+  protected_props = ["id","username", "gh_full_name", "github_pages_url", "github_url"]
   protected_props.each do |property|
     # If this property is in their params array, delete it out.
     if params[:book][property]
@@ -294,7 +359,18 @@ put "/books/:id" do
     end
   end
 
+  # Update license fields.
+  license_choice = params[:book]["license"]
+  unless license_choice.nil? || license_choice.downcase == "other"
+    license_info = get_license_info(license_choice)
+    params[:book]["license_name"] = license_info[:name]
+    params[:book]["license_url"] = license_info[:url]
+  end
+
   if @book.update_attributes(params[:book])
+    # Queue this book rebuild with sidekiq.
+    SinatraWorker.perform_async(@book.id)
+
     flash[:success] = "Your changes have been made."
     redirect "/my-books"
   else
@@ -364,6 +440,18 @@ def get_octokit()
   end
 end
 
+# Get License info from token.
+def get_license_info(token)
+  licenses = Hash.new
+  licenses["cc-by"] = { :name => 'Attribution', :url => 'https://creativecommons.org/licenses/by/4.0' }
+  licenses["cc-by-nd"] = { :name => 'Attribution-NoDerivs', :url => 'https://creativecommons.org/licenses/by-nd/4.0' }
+  licenses["cc-by-sa"] = { :name => 'Attribution-ShareAlike', :url => 'https://creativecommons.org/licenses/by-sa/4.0' }
+  licenses["cc-by-nc"] = { :name => 'Attribution-NonCommercial', :url => 'https://creativecommons.org/licenses/by-nc/4.0' }
+  licenses["cc-by-nc-sa"] = { :name => 'Attribution-NonCommercial-ShareAlike', :url => 'https://creativecommons.org/licenses/by-nc-sa/4.0' }
+  licenses["cc-by-nc-nd"] = { :name => 'Attribution-NonCommercial-NoDerivs', :url => 'https://creativecommons.org/licenses/by-nc-nd/4.0' }
+  license_info = licenses[token]
+end
+
 # Get all repos that would qualify for a new book-site.
 def get_qualifying_repos(client)
   if !authenticated?
@@ -411,6 +499,7 @@ def get_qualifying_repos(client)
 
   return repos
 end
+
 
 # This is a helper function for getting API data via REST api calls. A little
 # bit more manual than using octokit. I'll leave it here until I get a more 
@@ -501,32 +590,42 @@ helpers do
   # Get github project name
   # @todo: see if I can refactor this such that I don't have to reconnect to the
   # client for every helper. That's got to be a drag on performance.
-  def get_repo_name(full_name)
-    client = Octokit::Client.new :access_token => session[:access_token]
+  def get_repo_name(full_name, client = nil)
+    if !client
+      client = Octokit::Client.new :access_token => session[:access_token]
+    end
     repo_name = client.repository(full_name).name
   end
 
   # Get github project star count
-  def get_star_count(full_name)
-    client = Octokit::Client.new :access_token => session[:access_token]
+  def get_star_count(full_name, client = nil)
+    if !client
+      client = Octokit::Client.new :access_token => session[:access_token]
+    end
     star_count = client.repository(full_name).stargazers_count
   end
 
   # Get github project issue count
-  def get_issue_count(full_name)
-    client = Octokit::Client.new :access_token => session[:access_token]
+  def get_issue_count(full_name, client = nil)
+    if !client
+      client = Octokit::Client.new :access_token => session[:access_token]
+    end
     issue_count = client.repository(full_name).open_issues_count
   end
 
   # Get github project forks count
-  def get_fork_count(full_name)
-    client = Octokit::Client.new :access_token => session[:access_token]
+  def get_fork_count(full_name, client = nil)
+    if !client
+      client = Octokit::Client.new :access_token => session[:access_token]
+    end
     forks_count = client.repository(full_name).forks_count
   end
 
   # Get github project pull request count
-  def get_pull_request_count(full_name)
-    client = Octokit::Client.new :access_token => session[:access_token]
+  def get_pull_request_count(full_name, client = nil)
+    if !client
+      client = Octokit::Client.new :access_token => session[:access_token]
+    end
     pull_request_count = client.pull_requests(full_name, :state => 'open').length
   end
 
@@ -545,26 +644,24 @@ helpers do
     case book.license
     when nil
       # Needed to escape double quotes because I want attributes with double quotes as well as interpolate the book value.
-      return "None<a class=\"btn btn-mini\" href=\"/books/#{book.id}/edit#license\">Choose a License</a>"
+      return 'None<a class="btn btn-mini" href="/books/' + book.id + '/edit#license">Choose a License</a>'
     when "cc-by"
-      return '<a href="http://creativecommons.org/licenses/by/4.0/" class="linked-icon" title="Attribution"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="cc-title">Attribution</span></a>'
+      return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="cc-title">' + book.license_name + '</span></a>'
     when "cc-by-nd"
-      return '<a href="http://creativecommons.org/licenses/by-nd/4.0/" class="linked-icon" title="Attribution-NoDerivs"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nd"></span><span class="cc-title">Attribution-NoDerivs</span></a>'
+      return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nd"></span><span class="cc-title">' + book.license_name + '</span></a>'
     when "cc-by-sa"
-      return '<a href="http://creativecommons.org/licenses/by-sa/4.0/" class="linked-icon" title="Attribution-ShareAlike"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-sa"></span><span class="cc-title">Attribution-ShareAlike</span></a>'
+      return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-sa"></span><span class="cc-title">' + book.license_name + '</span></a>'
     when "cc-by-nc"
-      return '<a href="http://creativecommons.org/licenses/by-nc/4.0/" class="linked-icon" title="Attribution-NonCommercial"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nc"></span><span class="cc-title">Attribution-NonCommercial</span></a>'
+      return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nc"></span><span class="cc-title">' + book.license_name + '</span></a>'
     when "cc-by-nc-sa"
-      return '<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" class="linked-icon" title="Attribution-NonCommercial-ShareAlike"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nc"></span><span class="icon-cc-sa"></span><span class="cc-title">Attribution-NonCommercial-ShareAlike</span></a>'
+      return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nc"></span><span class="icon-cc-sa"></span><span class="cc-title">' + book.license_name + '</span></a>'
     when "cc-by-nc-nd"
-      return '<a href="http://creativecommons.org/licenses/by-nc-nd/4.0/" class="linked-icon" title="Attribution-NonCommercial-NoDerivs"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nc"></span><span class="icon-cc-nd"></span><span class="cc-title">Attribution-NonCommercial-NoDerivs</span></a>'
+      return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="icon-cc-nc"></span><span class="icon-cc-nd"></span><span class="cc-title">' + book.license_name + '</span></a>'
     else
       # This is an "Other" license.
       # @todo, I could simplify the schema a bit by getting rid of the "Other license" field and just
       # allowing their custom license to be placed in the "license" field.
-      url = book.other_license_url
-      text = book.other_license
-      return '<a href="' + Rack::Utils.escape_html(url) + '">' + Rack::Utils.escape_html(text) + '</a>'
+      return '<a href="' + Rack::Utils.escape_html(book.license_url) + '" title="' + book.license_name + '">' + Rack::Utils.escape_html(book.license_name) + '</a>'
     end
   end
 
@@ -583,9 +680,9 @@ helpers do
   def link_to_book(book)
     # If a custom domain hasn't been specified, return the default github url.
     if book.domain.nil? || book.domain.empty?
-      book.url
+      book.github_pages_url
     else
-      # A custom domain has been specified. 
+      # A custom domain has been specified.
       return 'http://' + Rack::Utils.escape_html(book.domain)
     end
   end

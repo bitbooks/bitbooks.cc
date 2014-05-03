@@ -8,12 +8,6 @@
     }
   }
 
-  .new-form-container {
-    @extend .container;
-    width: 60%;
-    margin: 0 auto;
-  }
-
   .edit-form-container {
     width: 60%;
     margin-right: 2%;
@@ -28,6 +22,8 @@
   input[type=text] {
     width: 100%;
   }
+/*
+ * This looks unnecessary. Remove it if nothing looks broken having commmented it out.
 
   .site-url-wrapper {
     text-align: center;
@@ -36,7 +32,7 @@
   .site-url {
     font-size: 1.4em;
   }
-
+*/
   input.url-field {
     width: 50%;
     // float: left;
@@ -50,6 +46,109 @@
     vertical-align: middle;
     margin-right: 8px;
     font-size: 20px;
+  }
+}
+
+
+#new-book-form {
+  width: 60%;
+  margin: 0 auto;
+
+  > .required-notice {
+    margin: 10px 0 0 34px;
+  }
+}
+
+.new-book {
+  h1 {
+    text-align: center;
+  }
+
+  fieldset {
+    @extend .container;
+    padding: 0.5em 2em 1.5em;
+
+    &:not(:first-of-type) {
+      display: none;
+    }
+  }
+
+  .next {
+    float: right;
+  }
+
+  .previous {
+    float: left;
+  }
+}
+
+.progressbar {
+  list-style-type: none;
+  width: 590px;
+  margin: 0 auto;
+  padding: 0;
+
+  li {
+    list-style-type: none;
+    color: #444;
+    text-transform: uppercase;
+    font-size: 12px;
+    width: 25%;
+    float: left;
+    text-align: center;
+    margin: 0.5em 0 2.5em;
+    position: relative;
+
+    &:before {
+      width: 20px;
+      line-height: 20px;
+      display: block;
+      font-size: 10px;
+      color: transparent;
+      background: #d2d2d2;
+      border-radius: 50%;
+      margin: 0 auto 5px auto;
+    }
+
+    &:after {
+      content: '';
+      width: 100%;
+      height: 8px;
+      background: #d2d2d2;
+      position: absolute;
+      left: -50%;
+      top: 7px;
+      z-index: -1; /*put it behind the numbers*/
+    }
+
+    &:first-of-type:after {
+      display: none;
+    }
+  }
+
+  .active {
+    &:before {
+      color: transparent;
+      font-weight: bold;
+      background-color: $bb-green;
+    }
+    &:after {
+      color: transparent;
+      background-color: $bb-green;
+    }
+  }
+
+  .step1:before {
+    content: '1';
+  }
+  .step2:before {
+    content: '2';
+  }
+  .step3:before {
+    content: '3';
+  }
+  .step4:before {
+    content: '4';
   }
 }
 

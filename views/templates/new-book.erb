@@ -7,63 +7,94 @@
       <h1>Create a New Book</h1>
             <!-- this is the Add a new book form, which appears when the user clicks the + at the bottom of the page -->
       <form id="new-book-form" action="/books" method="post" enctype="multipart/form-data">
-        <div class="form-item">
-          <h3>Which Github Project contains the content for your book?</h3>
-          <label for="select_gh_project">Github Project*:</label><br />
-          <select name="book[gh_full_name]" id="select_gh_project" required>
-            <% @repos.each do |repo| %>
-              <option value="<%=h repo.full_name %>"><%=h repo.name %></option>
-            <% end %>
-          </select>
-        </div>
-        <!-- rest of form -->
-        <div class="form-item">
-          <label for="book-title">Book Title:<span class="required">*</span></label><br />
-          <input type="text" id="book-title" name="book[title]" required placeholder="Your Grandma's Guide to Perl" />
-          <div class="msg book-title-msg"></div>
-        </div>
-        <div class="form-item">
-          <label for="author">Author:<span class="required">*</span></label><br />
-          <input type="text" id="author" name="book[author]" required placeholder="Leroy Jenkins" />
-          <div class="msg author-msg"></div>
-        </div>
-        <div class="form-item">
-          <p class="form-label license-label">License:</p>
-          <label for="cc-by">Attribution</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by" value="cc-by" /><br/>
-          <label for="cc-by-nd">Attribution-NoDerivs</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nd" value="cc-by-nd" /><br/>
-          <label for="cc-by-sa">Attribution-ShareAlike</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-sa" value="cc-by-sa" /><br/>
-          <label for="cc-by-nc">Attribution-NonCommercial</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nc" value="cc-by-nc" /><br/>
-          <label for="cc-by-nc-sa">Attribution-NonCommercial-ShareAlike</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nc-sa" value="cc-by-nc-sa" /><br/>
-          <label for="cc-by-nc-nd">Attribution-NonCommercial-NoDerivs</label>
-          <input type="radio" class="radio" name="book[license]" id="cc-by-nc-nd" value="cc-by-nc-nd" /><br/>
-          <label for="other">Other</label>
-          <input type="radio" class="radio" name="book[license]" id="other" value="other" /><br/>
-          <span class="followup-q"><a href="#">How do I know which license to use?</a></span>
-          <div class="other-options" style="display: none;">
-            <label for"other-license">License Name: </label><br />
-            <input type="text" id="other-license" name="book[other_license]" /><br />
-            <label for"other-license-url">Link to License: </label><br />
-            <input type="url" id="other-license-url" name="book[other_license_url]"/><br />
-            <span class="followup-q"><a href="#">Can I just release it into the Public Domain?</a></span>
+        <!-- progressbar -->
+        <ul class="progressbar clearfix">
+          <li class="step1 active">Select Project</li>
+          <li class="step2">Title & Author</li>
+          <li class="step3">Choose a License</li>
+          <li class="step4">Choose a Theme</li>
+        </ul>
+        <fieldset>
+          <!-- @todo: add conditional options here, for people without any repos & those wanting to fork a starter project -->
+          <h2>Which Github Project contains the content for your book?</h2>
+          <div class="form-item">
+            <label for="select_gh_project" class="required">Github Project:</label><br />
+            <select name="book[gh_full_name]" id="select_gh_project" required>
+              <option value="bitbooks/example-book">-- none selected --</option>
+              <% @repos.each do |repo| %>
+                <option value="<%=h repo.full_name %>"><%=h repo.name %></option>
+              <% end %>
+            </select>
           </div>
-        </div>
-        <div class="form-item theme-options clearfix">
-          <label for="selected-theme">Theme*:</label><br />
-          <img src="/images/theme-glide-thumb.png" data-value="Glide" class="highlighted"/>
-          <img src="/images/theme-epsilon-thumb.png" data-value="Epsilon" />
-          <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
-          <input type="hidden" id="selected_theme" name="book[theme]" value="Glide" >
-        </div>
-        <div class="form-item">
-          <input class="btn btn-primary" type="submit" value="Build my Site" onclick="checkLicense()" /><br />
-          <small>By clicking this button, I agree to the Bitbooks <a href="#">Terms of Service</a>.</small>
-        </div>
-        <small class="required">* Required</small>
+          <div class="form-item clearfix">
+            <input type="button" name="next" class="next btn btn-primary" value="Next" />
+          </div>
+        </fieldset>
+        <fieldset>
+          <h2>Tell us your Book Information</h2>
+          <div class="form-item">
+            <label for="book-title" class="required">Book Title:</label><br />
+            <input type="text" id="book-title" name="book[title]" required placeholder="Your Grandma's Guide to Perl" />
+            <div class="msg book-title-msg"></div>
+          </div>
+          <div class="form-item">
+            <label for="author" class="required">Author:</label><br />
+            <input type="text" id="author" name="book[author]" required placeholder="Leroy Jenkins" />
+            <div class="msg author-msg"></div>
+          </div>
+          <div class="form-item clearfix">
+            <input type="button" name="previous" class="previous btn btn-primary" value="Previous" />
+            <input type="button" name="next" class="next btn btn-primary" value="Next" />
+          </div>
+        </fieldset>
+        <fieldset>
+          <h2>Choose a License</h2>
+          <div class="form-item">
+            <p>We recommend that you license your work using one of <a href="https://creativecommons.org/licenses/">the six Creative Commons licenses</a>. If you're not sure right now, you can skip this step.</p>
+            <p class="form-label license-label">License:</p>
+            <label for="cc-by">Attribution <a href="https://creativecommons.org/licenses/by/4.0" target="_blank"><small>See License Details</small></a></label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by" value="cc-by" /><br/>
+            <label for="cc-by-nd">Attribution-NoDerivs <a href="https://creativecommons.org/licenses/by-nd/4.0" target="_blank"><small>See License Details</small></a></label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nd" value="cc-by-nd" /><br/>
+            <label for="cc-by-sa">Attribution-ShareAlike <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank"><small>See License Details</small></a></label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-sa" value="cc-by-sa" /><br/>
+            <label for="cc-by-nc">Attribution-NonCommercial <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank"><small>See License Details</small></a></label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nc" value="cc-by-nc" /><br/>
+            <label for="cc-by-nc-sa">Attribution-NonCommercial-ShareAlike <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank"><small>See License Details</small></a></label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nc-sa" value="cc-by-nc-sa" /><br/>
+            <label for="cc-by-nc-nd">Attribution-NonCommercial-NoDerivs <a href="https://creativecommons.org/licenses/by-nc-nd/4.0" target="_blank"><small>See License Details</small></a></label>
+            <input type="radio" class="radio" name="book[license]" id="cc-by-nc-nd" value="cc-by-nc-nd" /><br/>
+            <label for="other">Other</label>
+            <input type="radio" class="radio" name="book[license]" id="other" value="other" /><br/>
+            <span class="followup-q"><a href="#">How do I know which license to use?</a></span>
+            <div class="other-options" style="display: none;">
+              <label for"other-license">License Name: </label><br />
+              <input type="text" id="other-license" name="book[license_name]" /><br />
+              <label for"other-license-url">Link to License: </label><br />
+              <input type="url" id="other-license-url" name="book[license_url]"/><br />
+            </div>
+          </div>
+          <div class="form-item clearfix">
+            <input type="button" name="previous" class="previous btn btn-primary" value="Previous" />
+            <input type="button" name="next" class="next btn btn-primary" value="Next" />
+          </div>
+        </fieldset>
+        <fieldset>
+          <h2>Choose a Theme</h2>
+          <div class="form-item theme-options clearfix">
+            <label for="selected-theme" class="required">Theme:</label><br />
+            <img src="/images/theme-glide-thumb.png" data-value="Glide" class="highlighted"/>
+            <img src="/images/theme-epsilon-thumb.png" data-value="Epsilon" />
+            <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
+            <input type="hidden" id="selected_theme" name="book[theme]" value="Glide" >
+          </div>
+          <p>You can always change this later.</p>
+          <div class="form-item clearfix">
+            <input type="button" name="previous" class="btn btn-primary previous" value="Previous" />
+            <input class="btn btn-action right" type="submit" value="Build my Site" onclick="checkLicense()" /><br />
+          </div>
+        </fieldset>
+        <div class="required-notice"><small>* Required</small></div>
       </form>
     </div>
   </div>

@@ -4,6 +4,9 @@
 .form-item {
   margin-bottom: 1.75em;
 }
+.form-item:last-of-type {
+  margin-bottom: 0;
+}
 
 .followup-q {
   font-size: 0.6em;
@@ -23,8 +26,9 @@ input[type=radio] {
   color: red;
 }
 
-.required {
+.required:after {
   color: red;
+  content: '*';
 }
 
 // Use this around dynamically populated data in the middle of normal

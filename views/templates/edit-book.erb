@@ -11,42 +11,41 @@
           <input type="hidden" name="_method" value="put" /> 
           <p class="gh-project"><strong>Project: </strong><%= @book.gh_full_name %></p>
           <div class="form-item">
-            <label for="book-title" class="form-label">Book Title:<span class="required">*</span></label><br />
+            <label for="book-title" class="form-label required">Book Title:</label><br />
             <input type="text" id="book-title" name="book[title]" required placeholder="Your Grandma's Guide to Perl" value="<%=h @book.title %>" />
             <div class="msg book-title-msg"></div>
           </div>
           <div class="form-item">
-            <label for="author" class="form-label">Author:<span class="required">*</span></label><br />
+            <label for="author" class="form-label required">Author:</label><br />
             <input type="text" id="author" name="book[author]" required placeholder="Leroy Jenkins" value="<%=h @book.author %>" />
             <div class="msg author-msg"></div>
           </div>
           <div class="form-item">
             <p id="license" class="form-label license-label">License:</p>
-            <label for="cc-by">Attribution</label>
+            <label for="cc-by">Attribution <a href="https://creativecommons.org/licenses/by/4.0" target="_blank"><small>See License Details</small></a></label>
             <input type="radio" class="radio" name="book[license]" id="cc-by" value="cc-by" <%= @book.license == 'cc-by' ? 'checked' : '' %> /><br/>
-            <label for="cc-by-nd">Attribution-NoDerivs</label>
+            <label for="cc-by-nd">Attribution-NoDerivs <a href="https://creativecommons.org/licenses/by-nd/4.0" target="_blank"><small>See License Details</small></a></label>
             <input type="radio" class="radio" name="book[license]" id="cc-by-nd" value="cc-by-nd" <%= @book.license == 'cc-by-nd' ? 'checked' : '' %> /><br/>
-            <label for="cc-by-sa">Attribution-ShareAlike</label>
+            <label for="cc-by-sa">Attribution-ShareAlike <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank"><small>See License Details</small></a></label>
             <input type="radio" class="radio" name="book[license]" id="cc-by-sa" value="cc-by-sa" <%= @book.license == 'cc-by-sa' ? 'checked' : '' %> /><br/>
-            <label for="cc-by-nc">Attribution-NonCommercial</label>
+            <label for="cc-by-nc">Attribution-NonCommercial <a href="https://creativecommons.org/licenses/by-nc/4.0" target="_blank"><small>See License Details</small></a></label>
             <input type="radio" class="radio" name="book[license]" id="cc-by-nc" value="cc-by-nc" <%= @book.license == 'cc-by-nc' ? 'checked' : '' %> /><br/>
-            <label for="cc-by-nc-sa">Attribution-NonCommercial-ShareAlike</label>
+            <label for="cc-by-nc-sa">Attribution-NonCommercial-ShareAlike <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank"><small>See License Details</small></a></label>
             <input type="radio" class="radio" name="book[license]" id="cc-by-nc-sa" value="cc-by-nc-sa" <%= @book.license == 'cc-by-nc-sa' ? 'checked' : '' %> /><br/>
-            <label for="cc-by-nc-nd">Attribution-NonCommercial-NoDerivs</label>
+            <label for="cc-by-nc-nd">Attribution-NonCommercial-NoDerivs <a href="https://creativecommons.org/licenses/by-nc-nd/4.0" target="_blank"><small>See License Details</small></a></label>
             <input type="radio" class="radio" name="book[license]" id="cc-by-nc-nd" value="cc-by-nc-nd" <%= @book.license == 'cc-by-nc-nd' ? 'checked' : '' %> /><br/>
             <label for="other">Other</label>
             <input type="radio" class="radio" name="book[license]" id="other" value="Other" <%= @book.license == 'Other' ? 'checked' : '' %> /><br/>
             <span class="followup-q"><a href="#">How do I know which license to use?</a></span>
             <div class="other-options" style="<%=h @book.license == 'Other' ? '' : 'display: none;' %>">
               <label for"other-license">License Name: </label><br />
-              <input type="text" id="other-license" name="book[other_license]" value="<%=h @book.other_license %>"/><br />
+              <input type="text" id="other-license" name="book[license_name]" value="<%=h @book.license_name %>"/><br />
               <label for"other-license-url">Link to License: </label><br />
-              <input type="url" id="other-license-url" name="book[other_license_url]" value="<%=h @book.other_license_url %>"/><br />
-              <span class="followup-q"><a href="#">Can I just release it into the Public Domain?</a></span>
+              <input type="url" id="other-license-url" name="book[license_url]" value="<%=h @book.license_url %>"/>
             </div>
           </div>
           <div class="form-item theme-options clearfix">
-            <label for="selected-theme" class="form-label">Theme:<span class="required">*</span></label><br />
+            <label for="selected-theme" class="form-label required">Theme:</label><br />
             <img src="/images/theme-glide-thumb.png" data-value="Glide" class="<%= @book.theme == 'Glide' ? 'highlighted' : '' %>" />
             <img src="/images/theme-epsilon-thumb.png" data-value="Epsilon" class="<%= @book.theme == 'Epsilon' ? 'highlighted' : '' %>" />
             <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
@@ -77,7 +76,7 @@
         <% else %>
           <h3>Add a Custom Domain</h3>
           <p>Configure your site to use your own custom domain name.</p>
-          <a class="btn" href="/books/<%= @book.id %>/domain"><span class="btn-icon icon-rocket"></span>Show me how</a>      
+          <a class="btn" href="/books/<%= @book.id %>/domain"><span class="btn-icon icon-rocket"></span>Add a Domain</a>
         <% end %>
       </div>
       <!-- This feature is on our list -->
@@ -90,8 +89,8 @@
       -->
       <div class="settings-content">
         <h3>Download your Site</h3>
-        <p>Download a .zip archive containing a the source of your site.</p>
-        <a class="btn" href="https://github.com/<%= @book.gh_full_name %>/archive/gh-pages.zip"><span class="btn-icon icon-download3"></span>Download</a>
+        <p>Download a .zip archive containing a copy of your site.</p>
+        <a class="btn" href="<%= @book.github_url %>/archive/gh-pages.zip"><span class="btn-icon icon-download3"></span>Download</a>
       </div>
       <!-- This feature is on our list -->
       <!--

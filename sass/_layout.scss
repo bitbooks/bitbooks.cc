@@ -30,8 +30,12 @@ section {
   .titlebar-links {
     float: right;
     font-family: $droid-sans;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: bold;
     margin: 6px 0 0;
+    a {
+      color: $bb-dark;
+    }
 
     li {
       display: inline;
@@ -69,7 +73,7 @@ section {
     margin: 0 auto;
   }
   */
-  
+
   .links {
     font-size: 12px;
     padding: 0;

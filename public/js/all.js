@@ -34,23 +34,63 @@ function checkLicense() {
   return true;
 }
 
-// onblur validation for all required fields.
+// This function checks to see if there are any required, unfilled,
+// fields on the page, and creates error messages for them. Good
+// for triggering on submit buttons, or on multi-step forms.
+function checkRequired(parent) {
+  parent.find('[required]').each(function(index) {
+    if(!$(this).val()) {
+      // Print message and add error class.
+      $(this).parents('.form-item').addClass('error');
+      $(this).siblings('.msg').text('This field is required.');
+    }
+  });
+}
+
+// Shake plugin
+$.fn.shake = function (options) {
+  // defaults
+  var settings = {
+    'shakes': 2,
+    'distance': 10,
+    'duration': 400
+  };
+  // merge options
+  if (options) {
+    $.extend(settings, options);
+  }
+  // make it so
+  var pos;
+  return this.each(function () {
+    $this = $(this);
+    // position if necessary
+    pos = $this.css('position');
+    if (!pos || pos === 'static') {
+        $this.css('position', 'relative');
+    }
+    // shake it
+    for (var x = 1; x <= settings.shakes; x++) {
+      $this.animate({ left: settings.distance * -1 }, (settings.duration / settings.shakes) / 4)
+        .animate({ left: settings.distance }, (settings.duration / settings.shakes) / 2)
+        .animate({ left: 0 }, (settings.duration / settings.shakes) / 4);
+      }
+  });
+};
+
+// Set onblur validation for all required fields.
 // If .book-form is on page, set up form validation logic.
 if ($('.book-form').length) {
-
-  // Custom validation for required fields.
-  var required = ['site-url', 'book-title', 'author']; // IDs of Required elements.
-  $.each(required, function(index, value) {
+  $('[required]').each(function(index) {
     // Add onblur handler for alerting when required fields are left empty.
-    $('#' + value).blur(function(e){
+    $(this).blur(function(e){
       if(!$(this).val()) {
         // Print message and add error class.
         $(this).parents('.form-item').addClass('error');
-        $('.' + value + '-msg').text('This field is required.');
+        $(this).siblings('.msg').text('This field is required.');
       } else {
         // Clear message and remove error class.
         $(this).parents('.form-item').removeClass('error');
-        $('.' + value + '-msg').empty();
+        $(this).siblings('.msg').empty();
       }
     });
   });
@@ -65,6 +105,91 @@ $('.flash .icon-cross').click(function(event) {
     $(this).css({"visibility":"hidden",display:'block'}).slideUp();
   });
 });
+
+// Progress bar and multi-step form animation on the new book page.
+var current_fs, next_fs, previous_fs; //fieldsets
+var left, opacity, scale; //fieldset properties which we will animate
+var animating; //flag to prevent quick multi-click glitches
+
+$(".next").click(function(){
+  if(animating) return false;
+  animating = true;
+
+  current_fs = $(this).closest("fieldset");
+  next_fs = $(this).closest("fieldset").next();
+
+  // cancel animation if there's an error in this fieldset.
+  checkRequired(current_fs);
+  if (current_fs.find(".error").length) {
+    current_fs.find(".error").shake();
+    animating = false;
+    return false;
+  }
+
+  //activate next step on progressbar using the index of next_fs
+  $(".progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+  //hide the current fieldset with style
+  current_fs.animate({opacity: 0}, {
+    step: function(now, mx) {
+      //as the opacity of current_fs reduces to 0 - stored in "now"
+      //1. scale current_fs down to 80%
+      scale = 1 - (1 - now) * 0.2;
+      current_fs.css({'transform': 'scale('+scale+')'});
+    },
+    duration: 500,
+    complete: function(){
+      current_fs.hide();
+      // Reset original style values.
+      current_fs.css({'transform': 'scale(1)', 'opacity': '1'});
+      next_fs.fadeIn();
+      animating = false;
+    },
+    //this comes from the custom easing plugin
+    easing: 'swing'
+  });
+});
+
+$(".previous").click(function(){
+  if(animating) return false;
+  animating = true;
+
+  current_fs = $(this).closest("fieldset");
+  previous_fs = $(this).closest("fieldset").prev();
+
+  // cancel animation if there's an error in this fieldset.
+  checkRequired(current_fs);
+  if (current_fs.find(".error").length) {
+    current_fs.find(".error").shake();
+    animating = false;
+    return false;
+  }
+
+  //de-activate current step on progressbar
+  $(".progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+
+  //hide the current fieldset with style
+  current_fs.animate({opacity: 0}, {
+    step: function(now, mx) {
+      //as the opacity of current_fs reduces to 0 - stored in "now"
+      //1. scale previous_fs down to 80%
+      scale = 1 - (1 - now) * 0.2;
+      current_fs.css({'transform': 'scale('+scale+')'});
+    },
+    duration: 500,
+    complete: function(){
+      current_fs.hide();
+      // Reset original style values.
+      current_fs.css({'transform': 'scale(1)', 'opacity': '1'});
+      previous_fs.fadeIn();
+      animating = false;
+    },
+    //this comes from the custom easing plugin
+    easing: 'swing'
+  });
+});
+
+
 
 // Behaviors on the domain page, including ajax form submission and undo request.
 
@@ -104,7 +229,7 @@ $('#domain-form').submit(function(event){
       error: function(){
         // If a pre-existing error message was on the page, remove it.
         $('#ajax-error').remove();
-        
+
         // Make and post a new error message.
         var message = '<div id="ajax-error" class="flash warning">Oops, something went wrong. Try again later.<a class="icon-cross" href="#"></a></div>';
         $('.custom-domain > .inside').prepend(message);

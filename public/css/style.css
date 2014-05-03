@@ -565,7 +565,7 @@ textarea {
   background: -o-linear-gradient(top, #f6f6f6, #dcdcdc);
   background: linear-gradient(top, #f6f6f6, #dcdcdc);
   box-shadow: inset 0px 1px 0px white, 0px 1px 2px rgba(0, 0, 0, 0.2);
-  color: #666;
+  color: #333333;
   font-size: 0.8em;
   text-shadow: 0 1px white;
   text-decoration: none;
@@ -1139,6 +1139,16 @@ textarea {
   visibility: hidden;
 }
 
+/* line 498, ../../sass/_base.scss */
+.right {
+  float: right;
+}
+
+/* line 502, ../../sass/_base.scss */
+.left {
+  float: left;
+}
+
 /*
  * Clearfix: contain floats
  *
@@ -1150,7 +1160,7 @@ textarea {
  * 2. The use of `table` rather than `block` is only necessary if using
  *    `:before` to contain the top-margins of child elements.
  */
-/* line 511, ../../sass/_base.scss */
+/* line 519, ../../sass/_base.scss */
 .clearfix:before,
 .clearfix:after {
   content: " ";
@@ -1159,7 +1169,7 @@ textarea {
   /* 2 */
 }
 
-/* line 516, ../../sass/_base.scss */
+/* line 524, ../../sass/_base.scss */
 .clearfix:after {
   clear: both;
 }
@@ -1168,7 +1178,7 @@ textarea {
  * For IE 6/7 only
  * Include this rule to trigger hasLayout and contain floats.
  */
-/* line 525, ../../sass/_base.scss */
+/* line 533, ../../sass/_base.scss */
 .clearfix {
   *zoom: 1;
 }
@@ -1178,53 +1188,59 @@ textarea {
   margin-bottom: 1.75em;
 }
 
-/* line 8, ../../sass/_components.scss */
+/* line 7, ../../sass/_components.scss */
+.form-item:last-of-type {
+  margin-bottom: 0;
+}
+
+/* line 11, ../../sass/_components.scss */
 .followup-q {
   font-size: 0.6em;
 }
 
-/* line 12, ../../sass/_components.scss */
+/* line 15, ../../sass/_components.scss */
 input[type=radio] {
   float: left;
   margin-right: 6px;
 }
 
-/* line 17, ../../sass/_components.scss */
+/* line 20, ../../sass/_components.scss */
 .success {
   color: green;
 }
 
-/* line 22, ../../sass/_components.scss */
+/* line 25, ../../sass/_components.scss */
 .failure,
 .warning {
   color: red;
 }
 
-/* line 26, ../../sass/_components.scss */
-.required {
+/* line 29, ../../sass/_components.scss */
+.required:after {
   color: red;
+  content: '*';
 }
 
-/* line 33, ../../sass/_components.scss */
+/* line 37, ../../sass/_components.scss */
 .custom-data {
   font-family: "Droid Sans", Helvetica, sans-serif;
   color: seagreen;
 }
 
-/* line 39, ../../sass/_components.scss */
-.container, .book-form .new-form-container, .book-form .edit-form-content, .settings-content, .domain-form-container {
+/* line 43, ../../sass/_components.scss */
+.container, .book-form .edit-form-content, .new-book fieldset, .settings-content, .domain-form-container {
   background: #fbfbfb;
   padding: 1px 2em 1em;
   border: 1px solid #ccc;
 }
 
-/* line 46, ../../sass/_components.scss */
+/* line 50, ../../sass/_components.scss */
 .center-box {
   display: block;
   margin: 0 auto;
 }
 
-/* line 53, ../../sass/_components.scss */
+/* line 57, ../../sass/_components.scss */
 .spinner {
   height: 60px;
   width: 60px;
@@ -1242,48 +1258,48 @@ input[type=radio] {
 }
 
 @-webkit-keyframes rotation {
-  /* line 70, ../../sass/_components.scss */
+  /* line 74, ../../sass/_components.scss */
   from {
     -webkit-transform: rotate(0deg);
   }
 
-  /* line 71, ../../sass/_components.scss */
+  /* line 75, ../../sass/_components.scss */
   to {
     -webkit-transform: rotate(359deg);
   }
 }
 
 @-moz-keyframes rotation {
-  /* line 75, ../../sass/_components.scss */
+  /* line 79, ../../sass/_components.scss */
   from {
     -moz-transform: rotate(0deg);
   }
 
-  /* line 76, ../../sass/_components.scss */
+  /* line 80, ../../sass/_components.scss */
   to {
     -moz-transform: rotate(359deg);
   }
 }
 
 @-o-keyframes rotation {
-  /* line 80, ../../sass/_components.scss */
+  /* line 84, ../../sass/_components.scss */
   from {
     -o-transform: rotate(0deg);
   }
 
-  /* line 81, ../../sass/_components.scss */
+  /* line 85, ../../sass/_components.scss */
   to {
     -o-transform: rotate(359deg);
   }
 }
 
 @keyframes rotation {
-  /* line 85, ../../sass/_components.scss */
+  /* line 89, ../../sass/_components.scss */
   from {
     transform: rotate(0deg);
   }
 
-  /* line 86, ../../sass/_components.scss */
+  /* line 90, ../../sass/_components.scss */
   to {
     transform: rotate(359deg);
   }
@@ -1323,20 +1339,25 @@ section {
 .titlebar .titlebar-links {
   float: right;
   font-family: "Droid Sans", Helvetica, sans-serif;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: bold;
   margin: 6px 0 0;
 }
 /* line 36, ../../sass/_layout.scss */
+.titlebar .titlebar-links a {
+  color: #333333;
+}
+/* line 40, ../../sass/_layout.scss */
 .titlebar .titlebar-links li {
   display: inline;
   padding-right: 16px;
 }
-/* line 41, ../../sass/_layout.scss */
+/* line 45, ../../sass/_layout.scss */
 .titlebar .inside {
   padding: 0.5em 1em;
 }
 
-/* line 47, ../../sass/_layout.scss */
+/* line 51, ../../sass/_layout.scss */
 .site-footer {
   color: #999;
   text-align: center;
@@ -1350,18 +1371,18 @@ section {
   }
   */
 }
-/* line 54, ../../sass/_layout.scss */
+/* line 58, ../../sass/_layout.scss */
 .site-footer .inside {
   padding-top: 0;
 }
-/* line 57, ../../sass/_layout.scss */
+/* line 61, ../../sass/_layout.scss */
 .site-footer .inside:before {
   margin-bottom: 1em;
   width: 100%;
   border-top: 1px solid #d2d2d2;
   border-bottom: 1px solid #fff;
 }
-/* line 73, ../../sass/_layout.scss */
+/* line 77, ../../sass/_layout.scss */
 .site-footer .links {
   font-size: 12px;
   padding: 0;
@@ -1369,25 +1390,25 @@ section {
   display: inline-block;
   list-style-type: none;
 }
-/* line 80, ../../sass/_layout.scss */
+/* line 84, ../../sass/_layout.scss */
 .site-footer .links li {
   float: left;
   padding-left: 16px;
 }
-/* line 84, ../../sass/_layout.scss */
+/* line 88, ../../sass/_layout.scss */
 .site-footer .links li:first-child {
   padding-left: 0;
 }
-/* line 89, ../../sass/_layout.scss */
+/* line 93, ../../sass/_layout.scss */
 .site-footer .links a {
   color: #999;
   text-decoration: underline;
 }
-/* line 94, ../../sass/_layout.scss */
+/* line 98, ../../sass/_layout.scss */
 .site-footer .left-links {
   float: left;
 }
-/* line 97, ../../sass/_layout.scss */
+/* line 101, ../../sass/_layout.scss */
 .site-footer .right-links {
   float: right;
 }
@@ -1509,6 +1530,20 @@ section {
   background-color: #262626;
 }
 
+/* line 1, ../../sass/_book_forms.scss */
+.book-form {
+  /*
+   * This looks unnecessary. Remove it if nothing looks broken having commmented it out.
+  
+    .site-url-wrapper {
+      text-align: center;
+    }
+  
+    .site-url {
+      font-size: 1.4em;
+    }
+  */
+}
 /* line 3, ../../sass/_book_forms.scss */
 .book-form .error input {
   border: 1px solid red;
@@ -1518,40 +1553,27 @@ section {
   color: red;
 }
 /* line 11, ../../sass/_book_forms.scss */
-.book-form .new-form-container {
-  width: 60%;
-  margin: 0 auto;
-}
-/* line 17, ../../sass/_book_forms.scss */
 .book-form .edit-form-container {
   width: 60%;
   margin-right: 2%;
   float: left;
 }
-/* line 23, ../../sass/_book_forms.scss */
+/* line 17, ../../sass/_book_forms.scss */
 .book-form .edit-form-content {
   border-top: none;
 }
-/* line 28, ../../sass/_book_forms.scss */
+/* line 22, ../../sass/_book_forms.scss */
 .book-form input[type=text] {
   width: 100%;
 }
-/* line 32, ../../sass/_book_forms.scss */
-.book-form .site-url-wrapper {
-  text-align: center;
-}
 /* line 36, ../../sass/_book_forms.scss */
-.book-form .site-url {
-  font-size: 1.4em;
-}
-/* line 40, ../../sass/_book_forms.scss */
 .book-form input.url-field {
   width: 50%;
   margin-right: 2px;
   padding-right: 4px;
   text-align: right;
 }
-/* line 49, ../../sass/_book_forms.scss */
+/* line 45, ../../sass/_book_forms.scss */
 .book-form .icon-checkmark,
 .book-form .icon-cross {
   vertical-align: middle;
@@ -1559,33 +1581,138 @@ section {
   font-size: 20px;
 }
 
-/* line 56, ../../sass/_book_forms.scss */
+/* line 53, ../../sass/_book_forms.scss */
+#new-book-form {
+  width: 60%;
+  margin: 0 auto;
+}
+/* line 57, ../../sass/_book_forms.scss */
+#new-book-form > .required-notice {
+  margin: 10px 0 0 34px;
+}
+
+/* line 63, ../../sass/_book_forms.scss */
+.new-book h1 {
+  text-align: center;
+}
+/* line 67, ../../sass/_book_forms.scss */
+.new-book fieldset {
+  padding: 0.5em 2em 1.5em;
+}
+/* line 71, ../../sass/_book_forms.scss */
+.new-book fieldset:not(:first-of-type) {
+  display: none;
+}
+/* line 76, ../../sass/_book_forms.scss */
+.new-book .next {
+  float: right;
+}
+/* line 80, ../../sass/_book_forms.scss */
+.new-book .previous {
+  float: left;
+}
+
+/* line 85, ../../sass/_book_forms.scss */
+.progressbar {
+  list-style-type: none;
+  width: 590px;
+  margin: 0 auto;
+  padding: 0;
+}
+/* line 91, ../../sass/_book_forms.scss */
+.progressbar li {
+  list-style-type: none;
+  color: #444;
+  text-transform: uppercase;
+  font-size: 12px;
+  width: 25%;
+  float: left;
+  text-align: center;
+  margin: 0.5em 0 2.5em;
+  position: relative;
+}
+/* line 102, ../../sass/_book_forms.scss */
+.progressbar li:before {
+  width: 20px;
+  line-height: 20px;
+  display: block;
+  font-size: 10px;
+  color: transparent;
+  background: #d2d2d2;
+  border-radius: 50%;
+  margin: 0 auto 5px auto;
+}
+/* line 113, ../../sass/_book_forms.scss */
+.progressbar li:after {
+  content: '';
+  width: 100%;
+  height: 8px;
+  background: #d2d2d2;
+  position: absolute;
+  left: -50%;
+  top: 7px;
+  z-index: -1;
+  /*put it behind the numbers*/
+}
+/* line 124, ../../sass/_book_forms.scss */
+.progressbar li:first-of-type:after {
+  display: none;
+}
+/* line 130, ../../sass/_book_forms.scss */
+.progressbar .active:before {
+  color: transparent;
+  font-weight: bold;
+  background-color: seagreen;
+}
+/* line 135, ../../sass/_book_forms.scss */
+.progressbar .active:after {
+  color: transparent;
+  background-color: seagreen;
+}
+/* line 141, ../../sass/_book_forms.scss */
+.progressbar .step1:before {
+  content: '1';
+}
+/* line 144, ../../sass/_book_forms.scss */
+.progressbar .step2:before {
+  content: '2';
+}
+/* line 147, ../../sass/_book_forms.scss */
+.progressbar .step3:before {
+  content: '3';
+}
+/* line 150, ../../sass/_book_forms.scss */
+.progressbar .step4:before {
+  content: '4';
+}
+
+/* line 155, ../../sass/_book_forms.scss */
 .form-label {
   font-family: "Droid Sans", Helvetica, sans-serif;
   font-weight: bold;
 }
 
-/* line 61, ../../sass/_book_forms.scss */
+/* line 160, ../../sass/_book_forms.scss */
 .license-label {
   margin-bottom: 4px;
 }
 
-/* line 65, ../../sass/_book_forms.scss */
+/* line 164, ../../sass/_book_forms.scss */
 .other-options label {
   font-style: italic;
 }
 
-/* line 69, ../../sass/_book_forms.scss */
+/* line 168, ../../sass/_book_forms.scss */
 #other-license {
   margin-bottom: 6px;
 }
 
-/* line 73, ../../sass/_book_forms.scss */
+/* line 172, ../../sass/_book_forms.scss */
 #other-license-url {
   width: 100%;
 }
 
-/* line 77, ../../sass/_book_forms.scss */
+/* line 176, ../../sass/_book_forms.scss */
 .gh-project {
   font-family: "Droid Sans", Helvetica, sans-serif;
   font-size: 22px;
@@ -1594,48 +1721,48 @@ section {
   text-align: center;
 }
 
-/* line 86, ../../sass/_book_forms.scss */
+/* line 185, ../../sass/_book_forms.scss */
 .theme-options img {
   border: 8px solid transparent;
   margin-right: 8px;
   float: left;
 }
-/* line 90, ../../sass/_book_forms.scss */
+/* line 189, ../../sass/_book_forms.scss */
 .theme-options img:hover {
   border: 8px solid #a8ffb2;
 }
-/* line 93, ../../sass/_book_forms.scss */
+/* line 192, ../../sass/_book_forms.scss */
 .theme-options img:nth-child(2n) {
   margin-right: 0;
 }
-/* line 98, ../../sass/_book_forms.scss */
+/* line 197, ../../sass/_book_forms.scss */
 .theme-options .highlighted {
   border: 8px solid #ff8e42;
 }
-/* line 100, ../../sass/_book_forms.scss */
+/* line 199, ../../sass/_book_forms.scss */
 .theme-options .highlighted:hover {
   border: 8px solid #ff8e42;
 }
 
-/* line 107, ../../sass/_book_forms.scss */
+/* line 206, ../../sass/_book_forms.scss */
 .book-form .settings-titlebar,
 .book-form .edit-form-titlebar {
   border: 1px solid #ccc;
   padding: 0 1em;
 }
 
-/* line 112, ../../sass/_book_forms.scss */
+/* line 211, ../../sass/_book_forms.scss */
 .settings-container {
   width: 37%;
   float: left;
 }
 
-/* line 117, ../../sass/_book_forms.scss */
+/* line 216, ../../sass/_book_forms.scss */
 .settings-content {
   border-top: none;
   padding: 1px 1em 1em;
 }
-/* line 122, ../../sass/_book_forms.scss */
+/* line 221, ../../sass/_book_forms.scss */
 .settings-content h3 {
   font-size: 18px;
   font-weight: bold;
@@ -1643,23 +1770,23 @@ section {
   text-shadow: 0 1px white;
 }
 
-/* line 130, ../../sass/_book_forms.scss */
+/* line 229, ../../sass/_book_forms.scss */
 .settings-change-domain {
   float: left;
 }
 
-/* line 134, ../../sass/_book_forms.scss */
+/* line 233, ../../sass/_book_forms.scss */
 .logout-form {
   display: inline;
 }
-/* line 137, ../../sass/_book_forms.scss */
+/* line 236, ../../sass/_book_forms.scss */
 .logout-form button {
   padding: 0;
   border: none;
   background: transparent;
   color: #ff8e42;
 }
-/* line 143, ../../sass/_book_forms.scss */
+/* line 242, ../../sass/_book_forms.scss */
 .logout-form button:hover {
   text-decoration: underline;
 }

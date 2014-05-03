@@ -11,6 +11,8 @@ gem "carrierwave"
 gem "rest-client"
 gem "json"
 gem "octokit", "~> 2.0"
+gem "sidekiq"
+gem "redis"
 
 group :development do
   gem "shotgun"

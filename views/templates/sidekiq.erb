@@ -1,0 +1,21 @@
+<section class="main styleguide">
+  <div class="inside">
+
+    <h1>Sinatra + Sidekiq Example</h1>
+    <h2>Failed: <%= @failed %></h2>
+    <h2>Processed: <%= @processed %></h2>
+
+    <form method="post" action="/sidekiq-test">
+      <input type="text" name="msg">
+      <input type="submit" value="Add Message">
+    </form>
+
+    <a href="/">Refresh page</a>
+
+    <h3>Messages</h3>
+    <% @messages.each do |msg| %>
+      <p><%= msg %></p>
+    <% end %>
+
+  </div>
+</section>
