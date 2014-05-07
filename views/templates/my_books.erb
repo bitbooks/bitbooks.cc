@@ -32,13 +32,13 @@
               <div class="secondary-info">
                 <h3>Github Info:</h3>
                 <div class="project-url">
-                  <a class="label" href="<%=h book.github_url %>"><%= get_repo_name(book.gh_full_name, @gh_data) %></a>
+                  <a class="label" href="<%=h book.github_url %>"><%= get_repo_name(book.gh_full_name, @github) %></a>
                 </div>
                   <ul class="repo-stats">
-                    <li><a href="<%=h book.github_url %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name, @gh_data) %></a></li>
-                    <li><a href="<%=h book.github_url %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name, @gh_data) %></a></li>
-                    <li><a href="<%=h book.github_url %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.gh_full_name, @gh_data) %></a></li>
-                    <li><a href="<%=h book.github_url %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.gh_full_name, @gh_data) %></a></li>
+                    <li><a href="<%=h book.github_url %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name, @github) %></a></li>
+                    <li><a href="<%=h book.github_url %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name, @github) %></a></li>
+                    <li><a href="<%=h book.github_url %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.gh_full_name, @github) %></a></li>
+                    <li><a href="<%=h book.github_url %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.gh_full_name, @github) %></a></li>
                   </ul>
               </div>
             </div>

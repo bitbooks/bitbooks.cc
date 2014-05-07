@@ -157,14 +157,6 @@ $(".previous").click(function(){
   current_fs = $(this).closest("fieldset");
   previous_fs = $(this).closest("fieldset").prev();
 
-  // cancel animation if there's an error in this fieldset.
-  checkRequired(current_fs);
-  if (current_fs.find(".error").length) {
-    current_fs.find(".error").shake();
-    animating = false;
-    return false;
-  }
-
   //de-activate current step on progressbar
   $(".progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
 
