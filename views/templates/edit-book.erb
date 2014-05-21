@@ -48,6 +48,7 @@
             <label for="selected-theme" class="form-label required">Theme:</label><br />
             <img src="/images/theme-glide-thumb.png" data-value="Glide" class="<%= @book.theme == 'Glide' ? 'highlighted' : '' %>" />
             <img src="/images/theme-epsilon-thumb.png" data-value="Epsilon" class="<%= @book.theme == 'Epsilon' ? 'highlighted' : '' %>" />
+            <img src="/images/theme-hamilton-thumb.png" data-value="Hamilton" class="<%= @book.theme == 'Hamilton' ? 'highlighted' : '' %>" />
             <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
             <input type="hidden" id="selected_theme" name="book[theme]" value="<%=h @book.theme %>" >
           </div>
@@ -60,6 +61,8 @@
     </div>
     <div class="settings-container">
       <div class="settings-titlebar"><h2>Site Options</h2></div>
+<% 
+=begin %>
       <div class="settings-content">
         <% if domain_is_custom(@book) %>
           <h3>Change Custom Domain</h3>
@@ -72,13 +75,15 @@
               <input id="domain-submit" class="btn" type="submit" value="Revert Domain" />
             </form>
           </div>
-          <p><small>Reverting your domain will make your site accessible at <span class="custom-data"><%= @book.url %></span></small></p>
+          <p><small>Reverting your domain will make your site accessible at <span class="custom-data"><%= @book.github_pages_url %></span></small></p>
         <% else %>
           <h3>Add a Custom Domain</h3>
           <p>Configure your site to use your own custom domain name.</p>
           <a class="btn" href="/books/<%= @book.id %>/domain"><span class="btn-icon icon-rocket"></span>Add a Domain</a>
         <% end %>
       </div>
+<% 
+=end %>
       <!-- This feature is on our list -->
       <!--
       <div class="settings-content">

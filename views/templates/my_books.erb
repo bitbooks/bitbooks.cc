@@ -11,8 +11,8 @@
       <% [*@books].each do |book| %>
         <li class="book">
           <div class="book-titlebar clearfix">
-            <a class="btn" href="/books/<%= book.id %>/edit"><span class="btn-icon icon-cog"></span>Book Settings</a>
-            <!-- <a class="btn" href="/books/<%= book.id %>/edit"><span class="btn-icon icon-pencil"></span>Change Details</a> -->
+            <a class="btn" href="/books/<%= book.id %>"><span class="btn-icon icon-cog"></span>Book Settings</a>
+            <!-- <a class="btn" href="/books/<%= book.id %>"><span class="btn-icon icon-pencil"></span>Change Details</a> -->
             <%# The link to prose doesn't require login, which is currently an issue, because of this bug: https://github.com/prose/prose/issues/643. Once it's fixed, I think the workflow will be ok. %>
             <a class="btn" href="http://prose.io/#<%=h book.gh_full_name %>"><!--<div class="icon-prose"></div>--><span class="btn-icon icon-pencil"></span>Edit Book with Prose</a>
           </div>
@@ -32,21 +32,22 @@
               <div class="secondary-info">
                 <h3>Github Info:</h3>
                 <div class="project-url">
-                  <a class="label" href="<%=h book.github_url %>"><%= get_repo_name(book.gh_full_name, @github) %></a>
+                  <a class="label" href="<%=h book.github_url %>"><%= get_repo_name(book.gh_full_name) %></a>
                 </div>
+                <% if !book.github_id.nil? %>
                   <ul class="repo-stats">
-                    <li><a href="<%=h book.github_url %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name, @github) %></a></li>
-                    <li><a href="<%=h book.github_url %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name, @github) %></a></li>
-                    <li><a href="<%=h book.github_url %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.gh_full_name, @github) %></a></li>
-                    <li><a href="<%=h book.github_url %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.gh_full_name, @github) %></a></li>
+                    <li><a href="<%=h book.github_url %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name) %></a></li>
+                    <li><a href="<%=h book.github_url %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name) %></a></li>
+                    <li><a href="<%=h book.github_url %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.gh_full_name) %></a></li>
+                    <li><a href="<%=h book.github_url %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.gh_full_name) %></a></li>
                   </ul>
+                <% end %>
               </div>
             </div>
           </div>
-          <!-- Add the "edit this book" form here -->
         </li>
       <% end %>
-      
+
         <li class="add-a-book"><a href="/books/new"><span class="icon-plus"></span>Create a new book</a></li>
       </ul>
     </div>

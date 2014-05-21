@@ -1,22 +1,33 @@
 # app.rb
 # The guts of our Sinatra app
 
-require "sinatra"
-require "sinatra/activerecord"
+require 'sinatra'
+require 'sinatra/activerecord'
 require 'sinatra/flash'
 require 'rest-client'
 require 'json'
 require 'octokit'
+require 'encrypted_cookie'
+require 'attr_encrypted'
 # for pretty print debugging
 require 'pp'
 
 
+# Environment Variables
+CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
+CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
+SESSION_SECRET = ENV['SESSION_SECRET']
+SECRET_KEY = ENV['SECRET_KEY']
+BITBOOKS_ROOT = ENV['BITBOOKS_ROOT']
+BITBINDER_ROOT = ENV['BITBINDER_ROOT']
+
 # Needed for making persistant messages with the sinatra/flash gem, and for
-# preserving github auth tokens across sessions.
-enable :sessions
+# preserving user sessions.
+ enable :sessions
+ set :session_secret, SESSION_SECRET
 
 # Set up the database
-set :database, "sqlite3:///blog.db"
+set :database, 'sqlite3:///blog.db'
 # I can query database objects with the Active Record Querying Interface
 # (see: http://guides.rubyonrails.org/active_record_querying.html)
 #
@@ -29,6 +40,7 @@ class Book < ActiveRecord::Base
 end
 class User < ActiveRecord::Base
   has_many :books
+  attr_encrypted :token, :key => SECRET_KEY
 end
 
 
@@ -39,15 +51,14 @@ end
 # http://developer.github.com/guides/basics-of-authentication/
 ######################################
 
-CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
-CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
-
+# @todo: Re-evaluate this authentication because it's just based on an encrypted
+# github_id, and it is used for access restrictions.
 def authenticated?
-  session[:access_token]
+  session[:github_id]
 end
 
 def authenticate!
-  message = 'Please <a href="https://github.com/login/oauth/authorize?scope=public_repo&client_id=' + CLIENT_ID + '">login with Github</a> to continue.'
+  message = 'Please <a href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=' + CLIENT_ID + '">login with Github</a> to continue.'
   flash[:info] = message
   redirect '/'
 end
@@ -69,22 +80,74 @@ end
 
 $redis = Redis.new
 
-class SinatraWorker
+class BuildWorker
   include Sidekiq::Worker
+  require 'pry-remote'
 
   # Define the action that we want the worker to do.
-  # @todo: Password protect this request (stored as an ENV variable)
+  # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
+  # @todo: stop passing tokens like this. It stores them unencrypted in the redis db!
+  # We can't reach the session token for the same reason that we can't reach instance variables.
   def perform(book_id)
     # We are sending the book's unique data (the contents of book.yml)
     # over in a post request. This will be used to build the book.
-    book_info = Book.find(book_id)
-    response = RestClient.post("127.0.0.1:4567/build", {:data => book_info.to_json}, {:content_type => :json, :accept => :json })
+    book = Book.find(book_id)
+    book_info = book.attributes
+    book_info['token'] = User.find(book.user_id).encrypted_token
+
+    response = RestClient.post(ENV['BITBINDER_ROOT'] + '/build', {:data => book_info.to_json}, {:content_type => :json, :accept => :json })
 
     # Throw in a message, for testing purposes.
-    $redis.lpush("sinkiq-example-messages", response)
+    $redis.lpush('sinkiq-example-messages', response)
   end
 end
 
+class CopyWorker
+  include Sidekiq::Worker
+  require 'pry-remote'
+
+  # Define the action that we want the worker to do.
+  # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
+  def perform(book_id)
+    # We are sending the book's unique data (the contents of book.yml)
+    # over in a post request. This will be used to build the book.
+    book = Book.find(book_id)
+    book_info = book.attributes
+    book_info['token'] = User.find(book.user_id).encrypted_token
+
+    response = RestClient.post(ENV['BITBINDER_ROOT'] + '/copy', {:data => book_info.to_json}, {:content_type => :json, :accept => :json })
+
+    # If the repo exists, kick off the next workers.
+    BuildWorker.perform_async(book_id)
+    UpdateWorker.perform_async(book_id)
+  end
+end
+
+class UpdateWorker
+  include Sidekiq::Worker
+  require 'pry-remote'
+
+  # The only reason this is in a worker is because I don't want to rely on how
+  # quickly Github's API can update. This system allows retries until it finds the
+  # updated data. The cost is one db hit, one extra github API request and a
+  # bit more complexity.
+  def perform(book_id)
+    book = Book.find(book_id)
+    token = User.find(book.user_id).token
+    github = Octokit::Client.new :access_token => token
+
+    repo_id = github.repository(book.gh_full_name).id
+    data = { "repo_id" => repo_id, "github_id" => github.user.id }
+
+    # I can't use "create_commit_hook()" from here because it's an instance method,
+    # not a class method. Options are: 1) Do this step via an http request
+    # (thus starting a new instance), 2) Convert it into a class method, or 3)
+    # re-implement the function steps here. I feel like option 1 is the right
+    # choice for now.
+    response = RestClient.post(BITBOOKS_ROOT + "/books/#{book_id}/repo-id", {:data => data}, {:content_type => :json, :accept => :json})
+
+  end
+end
 
 ######################################
 # Routing Calls
@@ -111,11 +174,6 @@ end
   erb :"templates/sidekiq"
 end
 
-# post '/sidekiq-test' do
-#   SinatraWorker.perform_async params[:msg]
-#   redirect to('/sidekiq-test')
-# end
-
 # Styleguide
 get "/styleguide" do
   erb :"templates/styleguide"
@@ -131,14 +189,12 @@ end
 get "/my-books" do
   if !authenticated?; authenticate!; end
 
-  # Get github data needed for this page.
-  @github = Octokit::Client.new :access_token => session[:access_token]
-  user = User.find_by(github_id: @github.user.id)
+  user = User.find_by(github_id: client.user.id)
 
-  # Get all books created by the current user.
+  # Get all books created by the current user, and if there are none,
+  # redirect to the "new book" page
   @books = Book.where("user_id = ?", user.id)
   if @books.empty?
-    flash[:info] = "Hi friend! Let's start you out by creating your first book."
     redirect "/books/new"
   end
 
@@ -150,27 +206,21 @@ end
 get "/books/new" do
   if !authenticated?; authenticate!; end
 
-  # Check if there is already a gh-pages branch. If so, warn the user that this will
-  # overwrite the contents of their gh-pages branch, and have them confirm that they're
-  # ok with that.
-  # @todo, add this check. Actually, I think I want to do this client-side, before the post.
-
-  # Get github repo data, and other data for this page.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  @repos = get_qualifying_repos(github)
+  # Get data for this page.
+  @repos = get_qualifying_repos
   @title = "Add a New Book"
   @book = Book.new
+  @username = client.user.login
   erb :"templates/new-book"
 end
 
 # A form for editing book details.
-get "/books/:id/edit" do
+get "/books/:id" do
   # Access to this page requires authentication.
   if !authenticated?; authenticate!; end
 
-  # Get github repo data, and other data for this page.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  user = User.find_by(github_id: github.user.id)
+  # Get data for this page.
+  user = User.find_by(github_id: client.user.id)
   @book = Book.find(params[:id])
   @title = "Change Book Details"
 
@@ -187,9 +237,8 @@ get "/books/:id/domain" do
   # Access to this page requires authentication.
   if !authenticated?; authenticate!; end
 
-  # Get github data, and other data for this page.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  user = User.find_by(github_id: github.user.id)
+  # Get data for this page.
+  user = User.find_by(github_id: client.user.id)
   @book = Book.find(params[:id])
   @title = "Add a Custom Domain"
 
@@ -211,7 +260,7 @@ end
 # Callback URL for Github Authentication. This gets a github oauth token for me
 # for use in acquiring API data. It runs every time a person uses "Log in
 # with Github". It's a bit manual and could be replaced with
-# https://github.com/atmos/sinatra_auth_github, but it works well for now.
+# https://github.com/atmos/sinatra_auth_github, (or, perhaps, Oauth2) but it works well for now.
 get '/callback' do
   # Get temporary GitHub code...
   session_code = request.env['rack.request.query_hash']['code']
@@ -228,14 +277,22 @@ get '/callback' do
   #   "scope":"user:email"
   # }
 
-  session[:access_token] = JSON.parse(result)['access_token']
+  token = JSON.parse(result)['access_token']
 
   # Uncomment the line below to get the access token (for fiddling with octokit in tux)
-  # flash[:info] = session[:access_token]
+  # flash[:info] = token
 
   # If a new user hasn't already been created, then create one now.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  create_new_user(github);
+  github = Octokit::Client.new :access_token => token
+  session[:github_id] = github.user.id
+
+  # We pass the github object because we don't know if the token has changed
+  # or not, and we need to be able to make db updates.
+  if !User.exists?(github_id: github.user.id)
+    create_new_user(github)
+  else
+    update_user_info(github)
+  end
 
   # As soon as anybody authenticates, we kick them to "my-books".
   redirect '/my-books'
@@ -249,7 +306,8 @@ end
 # - POST, (create records)
 # - DELETE, (delete records)
 #
-# (see also http://stackoverflow.com/questions/2001773)
+# (see also http://stackoverflow.com/questions/2001773
+#  and https://blog.apigee.com/detail/restful_api_design_nouns_are_good_verbs_are_bad)
 #
 # Our "records" noun will be "books".
 
@@ -262,30 +320,26 @@ post "/books" do
   # Access to this page requires authentication.
   if !authenticated?; authenticate!; end
 
-  # Get data from github and the post request for processing.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  username = github.user.login
-  current_user = User.find_by(github_id: github.user.id)
+  # Get relevant data.
+  username = client.user.login
+  current_user = User.find_by(github_id: client.user.id)
   full_name = params[:book]["gh_full_name"]
 
   # If this isn't a real repository, or the repository doesn't belong to this
   # user, cancel the request. This also prevents "collaborators" from making
   # a book-site for a repo that technically isn't theirs.
-  if !github.repository?(full_name) || username != full_name.split('/')[0]
+  if !client.repository?(full_name) || username != full_name.split('/')[0]
     flash[:warning] = "This book could not be created because you do not have access to this Github repository."
     redirect "/books/new"
   else
-    # Continue with book creation.
-    name = github.repository(full_name).name
+    # Assign values for cloned books.
+    cloned = (params[:book]["source"] == 'cloned')
+    full_name = params[:book]["gh_full_name"] = username + '/starter-book' if cloned
+    params[:book].delete("source") # No need to store this.
 
-    # Check our Books database to make sure this Book-site doesn't already exist
-    # (back button duplicate book submission).
-    #
-    # If we can't find a book in our database by this name...
-    if Book.find_by(gh_full_name: full_name).nil?
-      # This record doesn't exist. Good.
-    else
-      # They are trying to recreate a book already in our database. Let's prevent that.
+    # Prevent back-button duplicate book submission.
+    if Book.exists?(:gh_full_name => full_name)
+      # They are trying to recreate a book already in our database.
       flash[:warning] = "This book could not be created because there is already a book for this Github repository."
       redirect "/books/new"
     end
@@ -298,12 +352,13 @@ post "/books" do
     # Assign any data we want in our database to our POST params. We save them to
     # the params (instead of to the book object), in order to overwrite any erroneous
     # post data that anybody could inject:
+    params[:book]["github_id"] = client.repository(full_name).id unless cloned # The github repo ID
     params[:book]["user_id"] = current_user.id
-    params[:book]["github_id"] = github.repository(full_name).id # The github repo ID
     params[:book]["github_url"] = "https://github.com/" + full_name
-    params[:book]["github_pages_url"] = "http://" + username.downcase + ".github.io/" + name
+    params[:book]["github_pages_url"] = "http://" + username.downcase + ".github.io/" + full_name.split('/')[1]
     params[:book]["created_at"] = Time.now
     params[:book]["updated_at"] = Time.now
+
     # License Fields
     license_choice = params[:book]["license"]
     unless license_choice.nil? || license_choice == "other"
@@ -312,19 +367,22 @@ post "/books" do
       params[:book]["license_url"] = license_info[:url]
     end
 
-    ### Clone example book, if that option was chosen ###
-
     # Create book object and save it to the database.
     @book = Book.new(params[:book])
 
     if @book.save
-      # Queue this book build with sidekiq.
-      SinatraWorker.perform_async(@book.id)
+      # Queue jobs for the book.
+      if cloned
+        CopyWorker.perform_async(@book.id)
+      else
+        BuildWorker.perform_async(@book.id)
+        create_commit_hook(@book.id) if client.scopes.include?("admin:repo_hook") || client.scopes.include?("write:repo_hook")
+      end
 
-      flash[:success] = "Your site has been created."
+      flash[:success] = "Your site is being built! It may take a few minutes before it is available."
       redirect "/my-books"
     else
-      flash[:warning] = "Oops. Something went wrong and your book was not created. Please try again."
+      flash[:warning] = "Oops. Something went wrong and your site was not created. Please try again."
       redirect "/books/new"
     end
   end
@@ -341,9 +399,8 @@ put "/books/:id" do
   # Only authenticated users can make updates.
   if !authenticated?; authenticate!; end
 
-  # Get relevant book and github data.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  user = User.find_by(github_id: github.user.id)
+  # Get relevant book data.
+  user = User.find_by(github_id: client.user.id)
   @book = Book.find(params[:id])
 
   # Users can only update their own books.
@@ -372,7 +429,7 @@ put "/books/:id" do
 
   if @book.update_attributes(params[:book])
     # Queue this book rebuild with sidekiq.
-    SinatraWorker.perform_async(@book.id)
+    BuildWorker.perform_async(@book.id)
 
     flash[:success] = "Your changes have been made."
     redirect "/my-books"
@@ -380,6 +437,36 @@ put "/books/:id" do
     flash[:warning] = "Oops. Something went wrong. Try again."
     redirect "/books/#{params[:id]}/edit"
   end
+end
+
+# Expose an endpoint for post-commit hooks to trigger site builds.
+post "/books/:id/build" do
+
+  push = JSON.parse(request.body.read)
+
+  # Get access token
+  # (alternatively, get token from db, etc.)
+  token = params[:t]
+
+  # Github's initial 'ping' request (which is sent when a commit hook is created)
+  # chokes if we try to build a book with data it doesn't contain, so we only do
+  # a build if there is a 'repository' key. Also, to prevent infinite build loops,
+  # we only do a build when a change is made to the master branch.
+  if push.key?("repository") && push["ref"] == 'refs/heads/master'
+    BuildWorker.perform_async(params[:id], token)
+  end
+end
+
+# I'm using a new route instead of 'put "/books/:id"'' because 1) the other
+# route has baked in validation logic (for better or worse), 2) this is for
+# internal requests only, and 3) this specific request is needed often. The
+# path naming I went with is described here:
+# http://williamdurand.fr/2014/02/14/please-do-not-patch-like-an-idiot/
+post "/books/:id/repo-id" do
+  github_id = session[:github_id] = params[:data][:github_id]
+  book = Book.find(params[:id])
+  book.update(github_id: github_id)
+  create_commit_hook(params[:id])
 end
 
 # Reserving this GET request route for returning a list of books via JSON,
@@ -395,20 +482,22 @@ delete "/books/:id" do
   # Only authenticated users can delete books.
   if !authenticated?; authenticate!; end
 
-  # Get relevant book and github data.
-  github = Octokit::Client.new :access_token => session[:access_token]
-  user = User.find_by(github_id: github.user.id)
-  @book = Book.find(params[:id])
+  # Get relevant book data.
+  user = User.find_by(github_id: client.user.id)
+  book = Book.find(params[:id])
 
   # Users can only delete their own books.
-  if @book.user_id != user.id
+  if book.user_id != user.id
     flash[:warning] = "The site could not be deleted because you do not have access to this book."
     redirect "/my-books"
   end
 
-  # Delete the database record for the book.
-  @book.destroy
-  flash[:success] = "Bye Bye. Your book site has been deleted."
+  # Delete the site.
+  delete_branch(book.gh_full_name)
+  delete_commit_hook(book.id)
+  book.destroy
+
+  flash[:success] = "Your book site has been deleted."
   redirect "/my-books"
 end
 
@@ -417,14 +506,68 @@ end
 ######################################
 
 def create_new_user(github)
-  if !User.exists?(github_id: github.user.id)
-    user = User.new
-    user.github_id = github.user.id
-    user.username = github.user.login
-    user.email = github.user.email
-    user.created_at = Time.now
-    user.updated_at = Time.now
-    user.save
+  user = User.new
+  user.github_id = github.user.id
+  user.username = github.user.login
+  user.email = github.user.email
+  user.created_at = Time.now
+  user.updated_at = Time.now
+  user.token = github.access_token
+  user.save
+  flash[:info] = "Hi friend! Let's start you out by creating your first book."
+end
+
+def update_user_info(github)
+  user = User.find_by(github_id: session[:github_id])
+  user.username = github.user.login unless user.username == github.user.login
+  user.email = github.user.email unless user.email == github.user.email
+  user.token = github.access_token unless user.token == github.access_token
+  user.updated_at = Time.now
+  user.save
+end
+
+def create_commit_hook(book_id)
+  # @todo: This could be improved. What are the possible errors here? Hook
+  # already exists? Repo doesn't exist? Find a way to handle them all.
+  # @todo: Also, move the "check scopes" part into here as well.
+  book = Book.find(book_id)
+  config = { :url =>  BITBOOKS_ROOT + '/books/' + book_id.to_s + '/build?t=' + client.access_token, :content_type => 'json' }
+  options = { :name => 'web', :events => ['push'], :active => true }
+  hook = client.create_hook(book.gh_full_name, 'bitbooks', config, options)
+  if hook.nil?
+    flash[:info] = 'Your site will not be auto-updated with each commit.'
+  else
+    flash[:info] = 'Your site will now be updated automatically, with each new commit.'
+    book.update(hook_id: hook.id)
+  end
+end
+
+def delete_branch(github_full_name)
+  if client.scopes.include?("public_repo") || client.scopes.include?("repo")
+    client.delete_branch(github_full_name, 'gh-pages') if branch_exists?('gh-pages', github_full_name)
+  end
+end
+
+# @todo: See if this is helpful it's from copy-to, but I haven't integrated it yet.
+def repo_exists?(gh_full_name)
+  client.repository gh_full_name
+rescue Octokit::NotFound
+  false
+end
+
+# This function is a more atomic way to delete hooks, but it hits the database
+# two more times.
+#
+# @return [Boolean] True if hook removed & record updated, false if otherwise.
+def delete_commit_hook(book_id)
+  book = Book.find(book_id)
+  if repo_exists?(book.gh_full_name) && client.scopes.include?("admin:repo_hook")
+    removed = client.remove_hook(book.gh_full_name, book.hook_id)
+    if removed
+      book.update(hook_id: nil)
+    else
+      return false
+    end
   end
 end
 
@@ -440,22 +583,48 @@ def get_license_info(token)
   license_info = licenses[token]
 end
 
+
+# This is the main function for interfacing with the Github API. Unfortunately,
+# I had to make it more verbose in order to handle unauthorize errors (using
+# validate_credentials()... the rescue block just didn't seem to work). Maybe
+# some day I can get it back to the simplicity of "app_client" below it.
+def client
+  client_object_exists = (defined?(@client) != nil)
+  if client_object_exists
+    return @client
+  else
+    user = User.find_by(github_id: session[:github_id])
+    if Octokit.validate_credentials({ :access_token => user.token })
+        @client = Octokit::Client.new :access_token => user.token
+    else
+      authenticate!
+    end
+  end
+end
+
+# For generic API requests (provides higher rate-limits than when using user-token based calls).
+def app_client
+  @app_client ||= Octokit::Client.new :client_id => ENV['GH_BASIC_CLIENT_ID'], :client_secret => ENV['GH_BASIC_SECRET_ID']
+end
+
+def branch_exists?(branch_name, repo_full_name)
+  client.branch(repo_full_name, branch_name).present?
+rescue Octokit::NotFound
+  false
+end
+
 # Get all repos that would qualify for a new book-site.
-def get_qualifying_repos(github)
+def get_qualifying_repos
   if !authenticated?
     authenticate!
   end
-  if !github
-    github = Octokit::Client.new :access_token => session[:access_token]
-  end
 
   # Get Github data.
-  repos = github.repositories
-  username = github.user.login
+  repos = client.repositories
+  username = client.user.login
 
   # Compile a list of repositories for projecs that we've already used.
-  # (this is currently "ALL" projects. We should restrict it to this user's projects)
-  user = User.find_by(github_id: github.user.id)
+  user = User.find_by(github_id: client.user.id)
   used_repos = Array.new
   my_books = Book.where("user_id = ?", user.id)
   [*my_books].each do |book|
@@ -471,6 +640,13 @@ def get_qualifying_repos(github)
   # Iterate through our array of github repos and delete ones from the list
   # that don't qualify for a new book-site.
   repos.delete_if do |repo|
+    # First, while we're looping, add a method (and value) to each repo, for later use.
+    repo.class.module_eval { attr_accessor :has_gh_pages? }
+    if branch_exists?('gh-pages', repo.full_name)
+      repo.has_gh_pages = true
+    else
+      repo.has_gh_pages = false
+    end
     # Remove this repo if it matches the name for a user/org page project.
     if repo.name == name_match_1 || repo.name == name_match_2
       true
@@ -489,60 +665,6 @@ def get_qualifying_repos(github)
 
   return repos
 end
-
-=begin
-# This is a helper function for getting API data via REST api calls. A little
-# bit more manual than using octokit. I'll leave it here until I get a more 
-# elegant octokit-based one set up.
-def get_github_data()
-  if !authenticated?
-    authenticate!
-  else
-    access_token = session[:access_token]
-    scopes = []
-
-    begin
-      # Fetch information via the API. The data returned depends on the scope of
-      # access requested in the original login parameters. Currently, this
-      # returns all user data, but what we really need it for is to check and
-      # see that the token isn't revoked, and to get scope information for more
-      # specific requests from the header. For information about scopes see 
-      # http://developer.github.com/v3/oauth/#scopes
-      auth_result = RestClient.get('https://api.github.com/user',
-                                   {:params => {:access_token => access_token},
-                                    :accept => :json})
-    rescue => e
-      # Request didn't succeed because the token was revoked so we
-      # invalidate the token stored in the session and render the
-      # index page so that the user can start the OAuth flow again
-      session[:access_token] = nil
-      return authenticate!
-    end
-
-    # The request succeeded, so we check the list of current scopes
-    if auth_result.headers.include? :x_oauth_scopes
-      scopes = auth_result.headers[:x_oauth_scopes].split(', ')
-    end
-
-    auth_result = JSON.parse(auth_result)
-
-    # Uncomment this line to return a list of approved scopes.
-    # return scopes
-    # Uncomment this line to return a json dump of all available data.
-    # return auth_result
-
-    # @todo: Change this hardcoded user:email scope check and get request
-    #        to one powered by parameters passed into the method.
-    if scopes.include? 'user:email'
-      auth_result['private_emails'] =
-        JSON.parse(RestClient.get('https://api.github.com/user/emails',
-                       {:params => {:access_token => access_token},
-                        :accept => :json}))
-    end
-  end
-end
-=end
-
 
 
 ######################################
@@ -570,50 +692,47 @@ helpers do
   # Provide the Log-in or Log-out link, depending on the current login status.
   def login_link
     if !authenticated?
-      link = '<li><a href="https://github.com/login/oauth/authorize?scope=public_repo&client_id=' + CLIENT_ID + '">Log in</a></li>'
+      link = '<li><a href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=' + CLIENT_ID + '">Log in</a></li>'
     else
       link = '<li><a href="/logout">Log out</a></li>'
     end
   end
 
   # Github helpers getting repo-specific data
-  def get_repo_name(full_name, github = nil)
-    if !github
-      github = Octokit::Client.new :access_token => session[:access_token]
-    end
-    repo_name = github.repository(full_name).name
+  # @todo: Build error handling into these, in the case that a repo doesn't exist
+  #        (like it is still being cloned over).
+  def get_repo_name(full_name)
+    repo_name = client.repository(full_name).name
+  rescue Octokit::NotFound
+    "being cloned..."
   end
 
   # Get github project star count
-  def get_star_count(full_name, github = nil)
-    if !github
-      github = Octokit::Client.new :access_token => session[:access_token]
-    end
-    star_count = github.repository(full_name).stargazers_count
+  def get_star_count(full_name)
+    star_count = client.repository(full_name).stargazers_count
+  rescue Octokit::NotFound
+    nil
   end
 
   # Get github project issue count
-  def get_issue_count(full_name, github = nil)
-    if !github
-      github = Octokit::Client.new :access_token => session[:access_token]
-    end
-    issue_count = github.repository(full_name).open_issues_count
+  def get_issue_count(full_name)
+    issue_count = client.repository(full_name).open_issues_count
+  rescue Octokit::NotFound
+    nil
   end
 
   # Get github project forks count
-  def get_fork_count(full_name, github = nil)
-    if !github
-      github = Octokit::Client.new :access_token => session[:access_token]
-    end
-    forks_count = github.repository(full_name).forks_count
+  def get_fork_count(full_name)
+    forks_count = client.repository(full_name).forks_count
+  rescue Octokit::NotFound
+    nil
   end
 
   # Get github project pull request count
-  def get_pull_request_count(full_name, github = nil)
-    if !github
-      github = Octokit::Client.new :access_token => session[:access_token]
-    end
-    pull_request_count = github.pull_requests(full_name, :state => 'open').length
+  def get_pull_request_count(full_name)
+    pull_request_count = client.pull_requests(full_name, :state => 'open').length
+  rescue Octokit::NotFound
+    nil
   end
 
   # A helper for embedding SVG images
@@ -630,7 +749,6 @@ helpers do
   def license_link(book)
     case book.license
     when nil
-      # Needed to escape double quotes because I want attributes with double quotes as well as interpolate the book value.
       return 'None<a class="btn btn-mini" href="/books/' + book.id.to_s + '/edit#license">Choose a License</a>'
     when "cc-by"
       return '<a href="' + book.license_url + '" class="linked-icon" title="' + book.license_name + '"><span class="icon-cc"></span><span class="icon-cc-by"></span><span class="cc-title">' + book.license_name + '</span></a>'

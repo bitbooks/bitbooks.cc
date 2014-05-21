@@ -3,41 +3,46 @@
     <div class="inside">
       <%= styled_flash %>
 
-      <h1>Online books should be easy to write and free to read.</h1>
-      <p class="subtext">Bitbooks turns a repo full of markdown files into a fully fledged, hosted, online book. For free.</p>
-      <p class="form-text">…or at least it will soon. To stay in the loop, subscribe to receive updates (you can always unsubscribe later).</p>
+      <h1 class="visuallyhidden">Bitbooks: Build online books from Markdown content on Github.</h1>
+      <p class="subtext">Bitbooks turns a repo full of markdown files into a fully fledged, hosted, online book.</p>
 
-      <!-- Begin MailChimp Signup Form -->
-      <!-- <link href="//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css"> -->
-      <style type="text/css">
-
-        /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
-           We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
-      </style>
-      <div id="mc_embed_signup">
-        <!-- @todo: only show "login w/github" if a person isn't logged in -->
-      <p><a class="btn" href="https://github.com/login/oauth/authorize?scope=public_repo&client_id=<%= client_id %>"><span class="btn-icon icon-github2"></span>Login with Github</a></p>
-    <p></p>
-      <form action="http://Bitbooks.us7.list-manage.com/subscribe/post?u=2a35d9b83024bf99be808858d&amp;id=150e89a81b" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-        <label for="mce-EMAIL">Subscribe to receive updates.</label><br />
-        <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-        <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
-      </form>
-      </div>
+      <!-- @todo: only show "login w/github" if a person isn't logged in -->
+      <p><a class="btn" href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=<%= client_id %>"><span class="btn-icon icon-github2"></span>Login with Github</a></p>
 
       <!--End mc_embed_signup-->
     </div>
   </section>
     <section class="explainer explainer-0">
     <div class="inside">
-      <img class="bb-diff" src="images/bitbooks-diff-sm.png" />
-      <h2>What kind of books?</h2>
+      <h2>Books Built with Bitbooks</h2>
+      <div class="bwb-list clearfix">
+        <div class="bwb-item clearfix">
+          <h3 class="bwb-title">Book Title Here</h3>
+          <a href="#" class="bwb-book-link"><img class="bwb-book" src="/images/book_covers/book-green-sm.png" /></a>
+          <span class="bwb-author"> by First Last</span>
+          <a href="#" class="btn btn-primary">Read the Book</a>
+          <a href="#" class="btn">See it on Github</a>
+        </div>
+        <div class="bwb-item clearfix">
+          <h3 class="bwb-title">Book Title Here</h3>
+          <a href="#" class="bwb-book-link"><img class="bwb-book" src="/images/book_covers/book-red-sm.png" /></a>
+          <span class="bwb-author"> by First Last</span>
+          <a href="#" class="btn btn-primary">Read the Book</a>
+          <a href="#" class="btn">See it on Github</a>
+        </div>
+        <div class="bwb-item clearfix">
+          <h3 class="bwb-title">Book Title Here</h3>
+          <a href="#" class="bwb-book-link"><img class="bwb-book" src="/images/book_covers/book-teal-sm.png" /></a>
+          <span class="bwb-author"> by First Last</span>
+          <a href="#" class="btn btn-primary">Read the Book</a>
+          <a href="#" class="btn">See it on Github</a>
+        </div>
+      </div>
       <p>Creative-commons books for developer communities, like <a href="http://git-scm.com/book" target="_blank">Scott Chacon's Pro Git</a>, or <a href="http://diveintohtml5.info/" target="_blank">Mark Pilgram's Dive into HTML5</a>. Those guys are generous rockstars. Our mission is to pave the way for even more rockstars like them.</p>
     </div>
   </section>
   <section class="explainer explainer-1">
     <div class="inside">
-      <img class="bb-octocat" src="images/octocat_sm.png" />
       <h2>If you can use Github, you can use Bitbooks.</h2>
       <p>From edits to pull requests, you manage all your content on Github, just the way you're used to. Commits to your public repo will automagically update your book behind the scenes.</p>
     </div>

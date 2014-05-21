@@ -1,4 +1,4 @@
-// Styles for the launch page
+// (older) Styles for the launch page
 .jumbotron {
   background-image: url('../images/bookshelf_green.jpg');
   text-align: center;
@@ -12,7 +12,7 @@
   .form-text {
     font-size: 1em;
     margin: 0 auto;
-    max-width: 27.5em; // 440px / 16px 
+    max-width: 27.5em; // 440px / 16px
   }
 
   h1 {
@@ -42,8 +42,7 @@
   }
 
   p {
-    font-size: 1.5em;
-    line-height: 1.6;
+    font-size: 1.2em;
   }
 }
 
@@ -99,4 +98,36 @@
     @include box-shadow(none);
     background-color: darken($bb-dark, 5%);
   }
+}
+
+// (newer) Bitbooks front-page styles
+// (bwb = built with bitbooks)
+.bwb-container {
+  margin-bottom: 1em;
+}
+.bwb-item {
+  float: left;
+  width: 31%;
+  margin: 0 1%;
+
+  .btn-primary {
+    margin-top: 14px;
+  }
+}
+.bwb-book-link {
+  float: left;
+  display: block;
+  margin-right: 1em;
+}
+.bwb-book {
+  // Remove size restrictions, once we pull in GH stars, data, etc.)
+  width: 80px;
+  height: auto;
+}
+.bwb-title {
+  text-align: center;
+  font-size: 1.4em;
+}
+.bwb-author {
+  margin: 0 0 0 4px;
 }

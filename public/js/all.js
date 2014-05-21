@@ -19,11 +19,37 @@ if($('.theme-options').length !== 0) {
 // Behaviors for the "Other" license option.
 $('input.radio').click(function() {
   if($('#other').is(':checked')) {
-    $('.other-options').slideDown();
+    $('.other-options').slideDown('fast');
   } else {
-    $('.other-options').slideUp();
+    $('.other-options').slideUp('fast');
   }
 });
+
+// Behaviors for Clone vs Existing Project options.
+$('input.selection-radio').click(function() {
+  if($('#existing').is(':checked')) {
+    $('.github-options').slideDown('fast');
+  } else {
+    $('.github-options').slideUp('fast', function() {
+      // $('.github-warning').remove();
+    });
+  }
+});
+
+// Warning message when choosing a project with an existing gh-pages branch.
+checkForGithubPagesBranch(); // Check once, then add a listener for subesquent checks.
+$('#select_gh_project').change(function(e) {
+  $('.github-warning').remove();
+  checkForGithubPagesBranch();
+});
+
+function checkForGithubPagesBranch() {
+  var gh_pages_exists = $('#select_gh_project option:selected').data('gh-pages');
+  if (gh_pages_exists === true) {
+    var warning = '<div class="flash warning github-warning"><b>WAIT!</b> This project already has a gh-pages branch. If you build a book-site for this project, it will overwrite the contents of your existing Github pages site! <i>Consider yourself warned!</i></div>';
+    $('#select_gh_project').after(warning);
+  }
+}
 
 // This tiny function clears out the "Other License" fields on submission if
 // the "Other License" radio wasn't checked.
@@ -102,7 +128,7 @@ $('.flash').append('<a class="icon-cross" href="#"></a>');
 $('.flash .icon-cross').click(function(event) {
   event.preventDefault();
   $(this).parent('.flash').fadeOut(1000, function(){
-    $(this).css({"visibility":"hidden",display:'block'}).slideUp();
+    $(this).css({"visibility":"hidden",display:'block'}).slideUp('fast');
   });
 });
 
