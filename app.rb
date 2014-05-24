@@ -1,6 +1,7 @@
 # app.rb
 # The guts of our Sinatra app
 
+require 'bundler'
 require 'sinatra'
 require 'sinatra/activerecord'
 require 'sinatra/flash'
@@ -11,17 +12,15 @@ require 'attr_encrypted'
 # for pretty print debugging
 require 'pp'
 
-
-# Environment Variables
-CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
-CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
-SESSION_SECRET = ENV['SESSION_SECRET']
-SECRET_KEY = ENV['SECRET_KEY']
-HOOK_SECRET = ENV['HOOK_SECRET']
-BITBOOKS_PASS = ENV['BITBOOKS_PASS']
-BITBOOKS_ROOT = ENV['BITBOOKS_ROOT']
-BITBINDER_ROOT = ENV['BITBINDER_ROOT']
-
+# Environment Variables (with dummy placeholders)
+CLIENT_ID = ENV['GH_BASIC_CLIENT_ID'] || '12345'
+CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID'] || '12345'
+SESSION_SECRET = ENV['SESSION_SECRET'] || '12345'
+SECRET_KEY = ENV['SECRET_KEY'] || '12345'
+HOOK_SECRET = ENV['HOOK_SECRET'] || '12345'
+BITBOOKS_PASS = ENV['BITBOOKS_PASS'] || '12345'
+BITBOOKS_ROOT = ENV['BITBOOKS_ROOT'] || 'http://127.0.0.1:9393'
+BITBINDER_ROOT = ENV['BITBINDER_ROOT'] || 'http://127.0.0.1:9292'
 
 # Needed for making persistant messages with the sinatra/flash gem, and for
 # preserving user sessions.
@@ -691,7 +690,7 @@ end
 
 # For generic API requests (provides higher rate-limits than when using user-token based calls).
 def app_client
-  @app_client ||= Octokit::Client.new :client_id => ENV['GH_BASIC_CLIENT_ID'], :client_secret => ENV['GH_BASIC_SECRET_ID']
+  @app_client ||= Octokit::Client.new :client_id => GH_BASIC_CLIENT_ID, :client_secret => GH_BASIC_SECRET_ID
 end
 
 def branch_exists?(branch_name, repo_full_name)

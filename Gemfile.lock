@@ -58,6 +58,7 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
+    rake (0.9.6)
     redis (3.0.7)
     redis-namespace (1.4.1)
       redis (~> 3.0.4)
@@ -117,6 +118,7 @@ DEPENDENCIES
   pg
   pry
   pry-remote
+  rake
   redis
   rest-client
   shotgun

@@ -2,6 +2,7 @@
 source 'https://rubygems.org'
 ruby '2.0.0'
 
+gem "rake"
 gem "compass"
 gem "sinatra"
 gem "activerecord"
@@ -19,8 +20,8 @@ group :development do
   gem "shotgun"
   # For debugging.
   gem "tux"
-  gem "pry"
-  gem "pry-remote"
+  gem "pry", :require => true
+  gem "pry-remote", :require => true
 end
 
 group :production do

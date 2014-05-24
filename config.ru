@@ -1,7 +1,5 @@
 # config.ru
 # A conventional file used for deploying and integrating with some tools
-require 'pry'
-require 'pry-remote'
 
 require 'sidekiq'
 require 'sidekiq/web'
