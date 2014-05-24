@@ -28,6 +28,7 @@ BITBINDER_ROOT = ENV['BITBINDER_ROOT']
 enable :sessions
 set :session_secret, SESSION_SECRET
 
+=begin
 # Set up the database Model
 configure :development do
   # @todo: rename this dev database, because blog.db doesn't make much sense.
@@ -48,6 +49,7 @@ configure :production do
    :encoding => 'utf8'
  )
 end
+=end
 
 # I can query database objects with the Active Record Querying Interface
 # (see: http://guides.rubyonrails.org/active_record_querying.html)
@@ -116,7 +118,8 @@ $redis = Redis.new
 
 class BuildWorker
   include Sidekiq::Worker
-  require 'pry-remote'
+
+  # require 'pry-remote'
 
   # Define the action that we want the worker to do.
   # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
@@ -145,7 +148,8 @@ end
 
 class CopyWorker
   include Sidekiq::Worker
-  require 'pry-remote'
+
+  # require 'pry-remote'
 
   # Define the action that we want the worker to do.
   # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
@@ -173,7 +177,8 @@ end
 
 class UpdateWorker
   include Sidekiq::Worker
-  require 'pry-remote'
+
+  # require 'pry-remote'
 
   # The only reason this is in a worker is because I don't want to rely on how
   # quickly Github's API can update. This system allows retries until it finds the

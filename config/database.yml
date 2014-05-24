@@ -1,0 +1,18 @@
+# Config information for our database. This is a rails pattern, but it's
+# enabled for sinatra through the sinatra-activerecord gem.
+
+development:
+  adapter: sqlite3
+  database: blog.db
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: db
+  pool: 5
+  username: root
+  password: yR8K2IpzIc7xQjLv
+  host: 172.17.42.1
+  port: 49153

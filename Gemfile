@@ -1,10 +1,9 @@
 # Gemfile
 source 'https://rubygems.org'
+ruby '2.0.0'
 
 gem "compass"
 gem "sinatra"
-gem "sqlite3"
-
 gem "activerecord"
 gem "sinatra-activerecord"
 gem "sinatra-flash"
@@ -16,9 +15,10 @@ gem "redis"
 gem "attr_encrypted"
 
 group :development do
+  gem "sqlite3"
   gem "shotgun"
+  # For debugging.
   gem "tux"
-  # For runtime debugging.
   gem "pry"
   gem "pry-remote"
 end
