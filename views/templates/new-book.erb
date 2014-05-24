@@ -19,14 +19,14 @@
 
           <div class="form-item clearfix">
             <input type="radio" class="selection-radio" name="book[source]" id="clone" value="cloned" checked>
-            <label for="clone" class="selection-label">Clone our Starter Book Project</label>
+            <label for="clone" class="selection-label"><p>Clone our Starter Book Project</p></label>
             <input type="radio" class="selection-radio" name="book[source]" id="existing" value="existing">
-            <label for="existing" class="selection-label">Choose your own Existing Github Project</label>
+            <label for="existing" class="selection-label"><p>Choose your own Existing Github Project</p></label>
           </div>
 
           <div class="form-item github-options" style="display: none;">
             <label for="select_gh_project" class="select-gh-label">Github Project:</label>
-            <select name="book[gh_full_name]" id="select_gh_project" required>
+            <select name="book[gh_full_name]" id="select_gh_project">
               <% @repos.each do |repo| %>
                 <option data-gh-pages="<%=h repo.has_gh_pages %>" value="<%=h repo.full_name %>"><%=h repo.name %></option>
               <% end %>

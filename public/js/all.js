@@ -26,18 +26,19 @@ $('input.radio').click(function() {
 });
 
 // Behaviors for Clone vs Existing Project options.
-$('input.selection-radio').click(function() {
+$('input.selection-radio').click(function(e) {
   if($('#existing').is(':checked')) {
     $('.github-options').slideDown('fast');
   } else {
-    $('.github-options').slideUp('fast', function() {
-      // $('.github-warning').remove();
+    $('.github-options').slideUp('fast', function(ev) {
+      $('.github-warning').remove();
+      $('#select_gh_project').prop('selectedIndex', -1);
     });
   }
 });
 
 // Warning message when choosing a project with an existing gh-pages branch.
-checkForGithubPagesBranch(); // Check once, then add a listener for subesquent checks.
+$('#select_gh_project').prop('selectedIndex', -1);
 $('#select_gh_project').change(function(e) {
   $('.github-warning').remove();
   checkForGithubPagesBranch();
@@ -150,7 +151,12 @@ $(".next").click(function(){
     current_fs.find(".error").shake();
     animating = false;
     return false;
+  } else if ($('input[name="book[source]"]:checked', '#new-book-form').val() === "existing" && !$('#select_gh_project').val()) {
+    $('.github-options').shake();
+    animating = false;
+    return false;
   }
+
 
   //activate next step on progressbar using the index of next_fs
   $(".progressbar li").eq($("fieldset").index(next_fs)).addClass("active");

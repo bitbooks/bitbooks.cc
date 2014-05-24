@@ -174,11 +174,11 @@
 .theme-options {
   text-align: center;
   img {
-    border: 8px solid transparent;
+    border: 8px solid #e3e3e3;
     margin: 0 8px 8px 0;
 
     &:hover {
-      border: 8px solid #e3e3e3;
+      border: 8px solid #ccc;
     }
     &:nth-child(2n) {
       margin-right: 0;
@@ -244,12 +244,22 @@
   border: 8px solid #e3e3e3;
   width: 45%;
   min-height: 126px;
-  display: block;
+  display: table;
   float: left;
   margin: 2%;
   padding: 10px 8px 8px;
   text-align: center;
   font-size: 20px;
+
+  &:hover {
+    border: 8px solid #ccc;
+  }
+
+  p {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+  }
 }
 input[type="radio"]:checked + .selection-label {
   border: 8px solid $bb-orange;

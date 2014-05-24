@@ -9,7 +9,7 @@ require 'redis'
 
 require "./app"
 
-# Enable Sidekiq webvew
-# @todo (ensure this is only visible to me, maybe?)
+# Run both the main app and the sidekiq app
+# @todo (ensure Sidekiq webview is only visible to me, maybe?)
 # https://github.com/mperham/sidekiq/wiki/Monitoring#standalone-with-basic-auth
 run Rack::URLMap.new('/sidekiq' => Sidekiq::Web, '/' => Sinatra::Application)

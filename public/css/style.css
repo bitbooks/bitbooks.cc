@@ -1752,12 +1752,12 @@ section {
 }
 /* line 176, ../../sass/_book_forms.scss */
 .theme-options img {
-  border: 8px solid transparent;
+  border: 8px solid #e3e3e3;
   margin: 0 8px 8px 0;
 }
 /* line 180, ../../sass/_book_forms.scss */
 .theme-options img:hover {
-  border: 8px solid #e3e3e3;
+  border: 8px solid #ccc;
 }
 /* line 183, ../../sass/_book_forms.scss */
 .theme-options img:nth-child(2n) {
@@ -1830,33 +1830,43 @@ section {
   border: 8px solid #e3e3e3;
   width: 45%;
   min-height: 126px;
-  display: block;
+  display: table;
   float: left;
   margin: 2%;
   padding: 10px 8px 8px;
   text-align: center;
   font-size: 20px;
 }
-
 /* line 254, ../../sass/_book_forms.scss */
+.selection-label:hover {
+  border: 8px solid #ccc;
+}
+/* line 258, ../../sass/_book_forms.scss */
+.selection-label p {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* line 264, ../../sass/_book_forms.scss */
 input[type="radio"]:checked + .selection-label {
   border: 8px solid #ff8e42;
 }
 
-/* line 258, ../../sass/_book_forms.scss */
+/* line 268, ../../sass/_book_forms.scss */
 .select-gh-label {
   display: block;
   text-align: center;
   margin-bottom: 0.7em;
 }
 
-/* line 263, ../../sass/_book_forms.scss */
+/* line 273, ../../sass/_book_forms.scss */
 #select_gh_project {
   margin: 0 auto;
   display: block;
 }
 
-/* line 268, ../../sass/_book_forms.scss */
+/* line 278, ../../sass/_book_forms.scss */
 .github-warning.flash {
   padding: 1em;
   margin: 1em 0 0 0;

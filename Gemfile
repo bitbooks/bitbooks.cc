@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gem "compass"
 gem "sinatra"
 gem "sqlite3"
+
 gem "activerecord"
 gem "sinatra-activerecord"
 gem "sinatra-flash"
@@ -20,4 +21,8 @@ group :development do
   # For runtime debugging.
   gem "pry"
   gem "pry-remote"
+end
+
+group :production do
+  gem "pg"
 end

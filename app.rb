@@ -7,7 +7,6 @@ require 'sinatra/flash'
 require 'rest-client'
 require 'json'
 require 'octokit'
-require 'encrypted_cookie'
 require 'attr_encrypted'
 # for pretty print debugging
 require 'pp'
@@ -18,16 +17,38 @@ CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
 CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
 SESSION_SECRET = ENV['SESSION_SECRET']
 SECRET_KEY = ENV['SECRET_KEY']
+HOOK_SECRET = ENV['HOOK_SECRET']
+BITBOOKS_PASS = ENV['BITBOOKS_PASS']
 BITBOOKS_ROOT = ENV['BITBOOKS_ROOT']
 BITBINDER_ROOT = ENV['BITBINDER_ROOT']
 
+
 # Needed for making persistant messages with the sinatra/flash gem, and for
 # preserving user sessions.
- enable :sessions
- set :session_secret, SESSION_SECRET
+enable :sessions
+set :session_secret, SESSION_SECRET
 
-# Set up the database
-set :database, 'sqlite3:///blog.db'
+# Set up the database Model
+configure :development do
+  # @todo: rename this dev database, because blog.db doesn't make much sense.
+  #        not a high priority... at all.
+  set :database, 'sqlite:///blog.db'
+  set :show_exceptions, true
+end
+
+configure :production do
+ db = URI.parse(ENV['DATABASE_URL'] || 'postgres://root:yR8K2IpzIc7xQjLv@172.17.42.1:49153/db')
+
+ ActiveRecord::Base.establish_connection(
+   :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
+   :host     => db.host,
+   :username => db.user,
+   :password => db.password,
+   :database => db.path[1..-1],
+   :encoding => 'utf8'
+ )
+end
+
 # I can query database objects with the Active Record Querying Interface
 # (see: http://guides.rubyonrails.org/active_record_querying.html)
 #
@@ -63,6 +84,19 @@ def authenticate!
   redirect '/'
 end
 
+# Methods for restricting access to bitbooks-only internal API endpoints.
+# See http://www.sinatrarb.com/faq.html#auth
+def protected!
+  return if from_bitbooks?
+  headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+  halt 401, "Not authorized\n"
+end
+
+def from_bitbooks?
+  @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+  @auth.provided? and @auth.basic? and @auth.credentials and @auth.credentials == ['bitbooks', BITBOOKS_PASS]
+end
+
 ######################################
 # Async Queue setup
 # Example: https://github.com/mperham/sidekiq/blob/master/examples/sinkiq.rb
@@ -95,7 +129,14 @@ class BuildWorker
     book_info = book.attributes
     book_info['token'] = User.find(book.user_id).encrypted_token
 
-    response = RestClient.post(ENV['BITBINDER_ROOT'] + '/build', {:data => book_info.to_json}, {:content_type => :json, :accept => :json })
+    response = RestClient::Request.new(
+      :method => :post,
+      :url => BITBINDER_ROOT + '/build',
+      :user => 'bitbooks',
+      :password => BITBOOKS_PASS,
+      :payload => { :data => book_info.to_json },
+      :headers => { :content_type => :json, :accept => :json }
+    ).execute
 
     # Throw in a message, for testing purposes.
     $redis.lpush('sinkiq-example-messages', response)
@@ -115,7 +156,14 @@ class CopyWorker
     book_info = book.attributes
     book_info['token'] = User.find(book.user_id).encrypted_token
 
-    response = RestClient.post(ENV['BITBINDER_ROOT'] + '/copy', {:data => book_info.to_json}, {:content_type => :json, :accept => :json })
+    response = RestClient::Request.new(
+      :method => :post,
+      :url => BITBINDER_ROOT + '/copy',
+      :user => 'bitbooks',
+      :password => BITBOOKS_PASS,
+      :payload => { :data => book_info.to_json },
+      :headers => { :content_type => :json, :accept => :json }
+    ).execute
 
     # If the repo exists, kick off the next workers.
     BuildWorker.perform_async(book_id)
@@ -144,7 +192,16 @@ class UpdateWorker
     # (thus starting a new instance), 2) Convert it into a class method, or 3)
     # re-implement the function steps here. I feel like option 1 is the right
     # choice for now.
-    response = RestClient.post(BITBOOKS_ROOT + "/books/#{book_id}/repo-id", {:data => data}, {:content_type => :json, :accept => :json})
+    #response = RestClient.post(BITBOOKS_ROOT + "/books/#{book_id}/repo-id", {:data => data}, {:content_type => :json, :accept => :json})
+
+    response = RestClient::Request.new(
+      :method => :post,
+      :url => BITBOOKS_ROOT + "/books/#{book_id}/repo-id",
+      :user => 'bitbooks',
+      :password => BITBOOKS_PASS,
+      :payload => { :data => data },
+      :headers => { :content_type => :json, :accept => :json }
+    ).execute
 
   end
 end
@@ -324,16 +381,17 @@ post "/books" do
   username = client.user.login
   current_user = User.find_by(github_id: client.user.id)
   full_name = params[:book]["gh_full_name"]
+  cloned = (params[:book]["source"] == 'cloned')
 
   # If this isn't a real repository, or the repository doesn't belong to this
   # user, cancel the request. This also prevents "collaborators" from making
   # a book-site for a repo that technically isn't theirs.
-  if !client.repository?(full_name) || username != full_name.split('/')[0]
+  # Note: The only exception is cloned books. Those can pass through.
+  if (!client.repository?(full_name) || username != full_name.split('/')[0]) && !cloned
     flash[:warning] = "This book could not be created because you do not have access to this Github repository."
     redirect "/books/new"
   else
     # Assign values for cloned books.
-    cloned = (params[:book]["source"] == 'cloned')
     full_name = params[:book]["gh_full_name"] = username + '/starter-book' if cloned
     params[:book].delete("source") # No need to store this.
 
@@ -376,7 +434,7 @@ post "/books" do
         CopyWorker.perform_async(@book.id)
       else
         BuildWorker.perform_async(@book.id)
-        create_commit_hook(@book.id) if client.scopes.include?("admin:repo_hook") || client.scopes.include?("write:repo_hook")
+        create_commit_hook(@book.id)
       end
 
       flash[:success] = "Your site is being built! It may take a few minutes before it is available."
@@ -442,18 +500,26 @@ end
 # Expose an endpoint for post-commit hooks to trigger site builds.
 post "/books/:id/build" do
 
-  push = JSON.parse(request.body.read)
+  # Authenticate the request, by rebuilding the sha locally, and seeing if it matches.
+  # For more info, see: https://developer.github.com/v3/repos/hooks/#example, and
+  # https://github.com/github/github-services/blob/f3bb3dd780feb6318c42b2db064ed6d481b70a1f/lib/service/http_helper.rb#L77
+  headers = request.instance_variable_get("@env")
+  header_sha = headers['HTTP_X_HUB_SIGNATURE'].sub("sha1=", "")
+  body = request.body.read
+  local_sha = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha1'), HOOK_SECRET, body)
 
-  # Get access token
-  # (alternatively, get token from db, etc.)
-  token = params[:t]
+  if header_sha != local_sha
+    status 401 # unauthorized
+  else
+    push = JSON.parse(body)
 
-  # Github's initial 'ping' request (which is sent when a commit hook is created)
-  # chokes if we try to build a book with data it doesn't contain, so we only do
-  # a build if there is a 'repository' key. Also, to prevent infinite build loops,
-  # we only do a build when a change is made to the master branch.
-  if push.key?("repository") && push["ref"] == 'refs/heads/master'
-    BuildWorker.perform_async(params[:id], token)
+    # Github's initial 'ping' request (which is sent when a commit hook is created)
+    # chokes if we try to build a book with data it doesn't contain, so we only do
+    # a build if there is a 'repository' key. Also, to prevent infinite build loops,
+    # we only do a build when a change is made to the master branch.
+    if push.key?("repository") && push["ref"] == 'refs/heads/master'
+      BuildWorker.perform_async(params[:id])
+    end
   end
 end
 
@@ -463,6 +529,7 @@ end
 # path naming I went with is described here:
 # http://williamdurand.fr/2014/02/14/please-do-not-patch-like-an-idiot/
 post "/books/:id/repo-id" do
+  protected!
   github_id = session[:github_id] = params[:data][:github_id]
   book = Book.find(params[:id])
   book.update(github_id: github_id)
@@ -527,18 +594,32 @@ def update_user_info(github)
 end
 
 def create_commit_hook(book_id)
-  # @todo: This could be improved. What are the possible errors here? Hook
-  # already exists? Repo doesn't exist? Find a way to handle them all.
-  # @todo: Also, move the "check scopes" part into here as well.
-  book = Book.find(book_id)
-  config = { :url =>  BITBOOKS_ROOT + '/books/' + book_id.to_s + '/build?t=' + client.access_token, :content_type => 'json' }
-  options = { :name => 'web', :events => ['push'], :active => true }
-  hook = client.create_hook(book.gh_full_name, 'bitbooks', config, options)
-  if hook.nil?
-    flash[:info] = 'Your site will not be auto-updated with each commit.'
+  if client.scopes.include?("admin:repo_hook") || client.scopes.include?("write:repo_hook")
+    book = Book.find(book_id)
+    config =  {
+                :url =>  BITBOOKS_ROOT + '/books/' + book_id.to_s + '/build',
+                :content_type => 'json',
+                :secret => HOOK_SECRET
+              }
+    options = {
+                :name => 'web',
+                :events => ['push'],
+                :active => true
+              }
+    begin
+      hook = client.create_hook(book.gh_full_name, 'bitbooks', config, options)
+      book.update(hook_id: hook.id)
+      flash[:info] = 'Your site will now be updated automatically, with each new commit.'
+      return true
+    rescue Octokit::UnprocessableEntity # Commit hook already exists
+      flash[:info] = 'Your site will not be auto-updated with each commit.'
+      return false
+    rescue Octokit::NotFound # Page not found (likely, the repo doesn't exist)
+      flash[:info] = 'Your site will not be auto-updated with each commit.'
+      return false
+    end
   else
-    flash[:info] = 'Your site will now be updated automatically, with each new commit.'
-    book.update(hook_id: hook.id)
+    return false
   end
 end
 
@@ -562,6 +643,7 @@ end
 def delete_commit_hook(book_id)
   book = Book.find(book_id)
   if repo_exists?(book.gh_full_name) && client.scopes.include?("admin:repo_hook")
+    # No need for error handling because this function returns false if it fails.
     removed = client.remove_hook(book.gh_full_name, book.hook_id)
     if removed
       book.update(hook_id: nil)
@@ -595,7 +677,7 @@ def client
   else
     user = User.find_by(github_id: session[:github_id])
     if Octokit.validate_credentials({ :access_token => user.token })
-        @client = Octokit::Client.new :access_token => user.token
+      @client = Octokit::Client.new :access_token => user.token
     else
       authenticate!
     end
