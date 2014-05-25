@@ -27,28 +27,6 @@ BITBINDER_ROOT = ENV['BITBINDER_ROOT'] || 'http://127.0.0.1:9292'
 enable :sessions
 set :session_secret, SESSION_SECRET
 
-=begin
-# Set up the database Model
-configure :development do
-  # @todo: rename this dev database, because blog.db doesn't make much sense.
-  #        not a high priority... at all.
-  set :database, 'sqlite:///blog.db'
-  set :show_exceptions, true
-end
-
-configure :production do
- db = URI.parse(ENV['DATABASE_URL'] || 'postgres://root:yR8K2IpzIc7xQjLv@172.17.42.1:49153/db')
-
- ActiveRecord::Base.establish_connection(
-   :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
-   :host     => db.host,
-   :username => db.user,
-   :password => db.password,
-   :database => db.path[1..-1],
-   :encoding => 'utf8'
- )
-end
-=end
 
 # I can query database objects with the Active Record Querying Interface
 # (see: http://guides.rubyonrails.org/active_record_querying.html)

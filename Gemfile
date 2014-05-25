@@ -25,5 +25,5 @@ group :development do
 end
 
 group :production do
-  gem "pg"
+  gem "pg", "0.17.0" # I got errors when trying to update to "0.17.1" locally.
 end
