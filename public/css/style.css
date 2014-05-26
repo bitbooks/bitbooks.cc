@@ -1438,59 +1438,62 @@ section {
 }
 /* line 22, ../../sass/_launch.scss */
 .jumbotron .subtext {
-  font-size: 1.5em;
+  font-size: 2em;
   line-height: 1.5em;
-  max-width: 600px;
-  margin: 0 auto 2em;
+  max-width: 800px;
+  margin: 2em auto 1.5em;
 }
 
 /* line 32, ../../sass/_launch.scss */
 .explainer .inside {
-  border-top: 1px solid #fff;
-  border-bottom: 1px solid #ddd;
   padding-top: 2em;
   padding-right: 4em;
   padding-bottom: 2em;
 }
-/* line 40, ../../sass/_launch.scss */
+/* line 41, ../../sass/_launch.scss */
 .explainer h2 {
   font-size: 2.5em;
 }
-/* line 44, ../../sass/_launch.scss */
+/* line 45, ../../sass/_launch.scss */
 .explainer p {
   font-size: 1.2em;
 }
-
-/* line 50, ../../sass/_launch.scss */
-.explainer-2 h2 {
-  text-align: center;
+/* line 49, ../../sass/_launch.scss */
+.explainer:nth-child(2n) {
+  background-color: white;
 }
 
 /* line 55, ../../sass/_launch.scss */
+.explainer-3 h2 {
+  text-align: center;
+}
+
+/* line 60, ../../sass/_launch.scss */
 .bb-diff {
   float: left;
   margin: 0 3em 1em 0;
 }
 
-/* line 60, ../../sass/_launch.scss */
+/* line 65, ../../sass/_launch.scss */
 .bb-octocat {
   float: right;
   margin: 3em 0 0 1em;
+  max-width: 290px;
 }
 
-/* line 66, ../../sass/_launch.scss */
+/* line 72, ../../sass/_launch.scss */
 #mc_embed_signup {
   clear: left;
   font-family: Helvetica, Arial, sans-serif;
 }
-/* line 70, ../../sass/_launch.scss */
+/* line 76, ../../sass/_launch.scss */
 #mc_embed_signup label {
   text-indent: -9999px;
   display: block;
   height: 0;
 }
 
-/* line 77, ../../sass/_launch.scss */
+/* line 83, ../../sass/_launch.scss */
 #mce-EMAIL {
   padding: 0.5em;
   font-size: 1.5em;
@@ -1498,7 +1501,7 @@ section {
   border-radius: 2px;
 }
 
-/* line 84, ../../sass/_launch.scss */
+/* line 90, ../../sass/_launch.scss */
 #mc-embedded-subscribe {
   color: #f1f1f1;
   padding: 0.5em;
@@ -1515,13 +1518,13 @@ section {
   -moz-box-shadow: inset 0 10px 10px -10px #777777;
   box-shadow: inset 0 10px 10px -10px #777777;
 }
-/* line 94, ../../sass/_launch.scss */
+/* line 100, ../../sass/_launch.scss */
 #mc-embedded-subscribe:hover {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 97, ../../sass/_launch.scss */
+/* line 103, ../../sass/_launch.scss */
 #mc-embedded-subscribe:active {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
@@ -1529,42 +1532,52 @@ section {
   background-color: #262626;
 }
 
-/* line 105, ../../sass/_launch.scss */
+/* line 109, ../../sass/_launch.scss */
+.theme-thumbs {
+  text-align: center;
+  margin-top: 3em;
+}
+/* line 113, ../../sass/_launch.scss */
+.theme-thumbs img {
+  margin: 2em 1em;
+}
+
+/* line 120, ../../sass/_launch.scss */
 .bwb-container {
   margin-bottom: 1em;
 }
 
-/* line 108, ../../sass/_launch.scss */
+/* line 123, ../../sass/_launch.scss */
 .bwb-item {
   float: left;
   width: 31%;
   margin: 0 1%;
 }
-/* line 113, ../../sass/_launch.scss */
+/* line 128, ../../sass/_launch.scss */
 .bwb-item .btn-primary {
   margin-top: 14px;
 }
 
-/* line 117, ../../sass/_launch.scss */
+/* line 132, ../../sass/_launch.scss */
 .bwb-book-link {
   float: left;
   display: block;
   margin-right: 1em;
 }
 
-/* line 122, ../../sass/_launch.scss */
+/* line 137, ../../sass/_launch.scss */
 .bwb-book {
   width: 80px;
   height: auto;
 }
 
-/* line 127, ../../sass/_launch.scss */
+/* line 142, ../../sass/_launch.scss */
 .bwb-title {
   text-align: center;
   font-size: 1.4em;
 }
 
-/* line 131, ../../sass/_launch.scss */
+/* line 146, ../../sass/_launch.scss */
 .bwb-author {
   margin: 0 0 0 4px;
 }
