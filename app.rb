@@ -174,7 +174,6 @@ class UpdateWorker
     # (thus starting a new instance), 2) Convert it into a class method, or 3)
     # re-implement the function steps here. I feel like option 1 is the right
     # choice for now.
-    #response = RestClient.post(BITBOOKS_ROOT + "/books/#{book_id}/repo-id", {:data => data}, {:content_type => :json, :accept => :json})
 
     response = RestClient::Request.new(
       :method => :post,

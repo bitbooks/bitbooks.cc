@@ -1,6 +1,10 @@
 # Config information for our database. This is a rails pattern, but it's
 # enabled for sinatra through the sinatra-activerecord gem.
 
+# I think the production stuff isn't really necessary, since it's overwritten by the
+# DATABASE_URL environment variable. See:
+# https://www.digitalocean.com/community/articles/how-to-use-dokku-plugins-to-access-additional-functionality
+
 development:
   adapter: sqlite3
   database: blog.db
