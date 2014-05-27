@@ -22,6 +22,7 @@ group :development do
   gem "tux"
   gem "pry", :require => true
   gem "pry-remote", :require => true
+  gem "pry-debugger", :require => true
 end
 
 group :production do
