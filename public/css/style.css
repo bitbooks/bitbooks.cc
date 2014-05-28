@@ -1149,6 +1149,11 @@ textarea {
   float: left;
 }
 
+/* line 506, ../../sass/_base.scss */
+.full-img {
+  max-width: 100%;
+}
+
 /*
  * Clearfix: contain floats
  *
@@ -1160,7 +1165,7 @@ textarea {
  * 2. The use of `table` rather than `block` is only necessary if using
  *    `:before` to contain the top-margins of child elements.
  */
-/* line 519, ../../sass/_base.scss */
+/* line 523, ../../sass/_base.scss */
 .clearfix:before,
 .clearfix:after {
   content: " ";
@@ -1169,7 +1174,7 @@ textarea {
   /* 2 */
 }
 
-/* line 524, ../../sass/_base.scss */
+/* line 528, ../../sass/_base.scss */
 .clearfix:after {
   clear: both;
 }
@@ -1178,7 +1183,7 @@ textarea {
  * For IE 6/7 only
  * Include this rule to trigger hasLayout and contain floats.
  */
-/* line 533, ../../sass/_base.scss */
+/* line 537, ../../sass/_base.scss */
 .clearfix {
   *zoom: 1;
 }
@@ -1443,57 +1448,68 @@ section {
   max-width: 800px;
   margin: 2em auto 1.5em;
 }
-
+/* line 28, ../../sass/_launch.scss */
+.jumbotron .subtext a {
+  color: #f1f1f1;
+  border-bottom: 2px solid #f1f1f1;
+}
 /* line 32, ../../sass/_launch.scss */
+.jumbotron .subtext a:hover {
+  text-decoration: none;
+  color: #a8ffb2;
+  border-bottom: 2px solid #a8ffb2;
+}
+
+/* line 43, ../../sass/_launch.scss */
 .explainer .inside {
   padding-top: 2em;
   padding-right: 4em;
   padding-bottom: 2em;
 }
-/* line 41, ../../sass/_launch.scss */
+/* line 52, ../../sass/_launch.scss */
 .explainer h2 {
   font-size: 2.5em;
 }
-/* line 45, ../../sass/_launch.scss */
+/* line 56, ../../sass/_launch.scss */
 .explainer p {
   font-size: 1.2em;
 }
-/* line 49, ../../sass/_launch.scss */
+/* line 60, ../../sass/_launch.scss */
 .explainer:nth-child(2n) {
   background-color: white;
 }
 
-/* line 55, ../../sass/_launch.scss */
+/* line 66, ../../sass/_launch.scss */
 .explainer-3 h2 {
   text-align: center;
 }
 
-/* line 60, ../../sass/_launch.scss */
+/* line 71, ../../sass/_launch.scss */
 .bb-diff {
   float: left;
   margin: 0 3em 1em 0;
 }
 
-/* line 65, ../../sass/_launch.scss */
+/* line 76, ../../sass/_launch.scss */
 .bb-octocat {
   float: right;
   margin: 3em 0 0 1em;
   max-width: 290px;
 }
 
-/* line 72, ../../sass/_launch.scss */
+/* line 83, ../../sass/_launch.scss */
 #mc_embed_signup {
   clear: left;
   font-family: Helvetica, Arial, sans-serif;
 }
-/* line 76, ../../sass/_launch.scss */
+/* line 87, ../../sass/_launch.scss */
 #mc_embed_signup label {
   text-indent: -9999px;
   display: block;
   height: 0;
 }
 
-/* line 83, ../../sass/_launch.scss */
+/* line 94, ../../sass/_launch.scss */
 #mce-EMAIL {
   padding: 0.5em;
   font-size: 1.5em;
@@ -1501,7 +1517,7 @@ section {
   border-radius: 2px;
 }
 
-/* line 90, ../../sass/_launch.scss */
+/* line 101, ../../sass/_launch.scss */
 #mc-embedded-subscribe {
   color: #f1f1f1;
   padding: 0.5em;
@@ -1518,13 +1534,13 @@ section {
   -moz-box-shadow: inset 0 10px 10px -10px #777777;
   box-shadow: inset 0 10px 10px -10px #777777;
 }
-/* line 100, ../../sass/_launch.scss */
+/* line 111, ../../sass/_launch.scss */
 #mc-embedded-subscribe:hover {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 103, ../../sass/_launch.scss */
+/* line 114, ../../sass/_launch.scss */
 #mc-embedded-subscribe:active {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
@@ -1532,52 +1548,52 @@ section {
   background-color: #262626;
 }
 
-/* line 109, ../../sass/_launch.scss */
+/* line 120, ../../sass/_launch.scss */
 .theme-thumbs {
   text-align: center;
   margin-top: 3em;
 }
-/* line 113, ../../sass/_launch.scss */
+/* line 124, ../../sass/_launch.scss */
 .theme-thumbs img {
   margin: 2em 1em;
 }
 
-/* line 120, ../../sass/_launch.scss */
+/* line 131, ../../sass/_launch.scss */
 .bwb-container {
   margin-bottom: 1em;
 }
 
-/* line 123, ../../sass/_launch.scss */
+/* line 134, ../../sass/_launch.scss */
 .bwb-item {
   float: left;
   width: 31%;
   margin: 0 1%;
 }
-/* line 128, ../../sass/_launch.scss */
+/* line 139, ../../sass/_launch.scss */
 .bwb-item .btn-primary {
   margin-top: 14px;
 }
 
-/* line 132, ../../sass/_launch.scss */
+/* line 143, ../../sass/_launch.scss */
 .bwb-book-link {
   float: left;
   display: block;
   margin-right: 1em;
 }
 
-/* line 137, ../../sass/_launch.scss */
+/* line 148, ../../sass/_launch.scss */
 .bwb-book {
   width: 80px;
   height: auto;
 }
 
-/* line 142, ../../sass/_launch.scss */
+/* line 153, ../../sass/_launch.scss */
 .bwb-title {
   text-align: center;
   font-size: 1.4em;
 }
 
-/* line 146, ../../sass/_launch.scss */
+/* line 157, ../../sass/_launch.scss */
 .bwb-author {
   margin: 0 0 0 4px;
 }
