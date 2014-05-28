@@ -1480,36 +1480,37 @@ section {
 }
 
 /* line 66, ../../sass/_launch.scss */
-.explainer-3 h2 {
+.explainer-themes,
+.explainer-os {
   text-align: center;
 }
 
-/* line 71, ../../sass/_launch.scss */
+/* line 70, ../../sass/_launch.scss */
 .bb-diff {
   float: left;
   margin: 0 3em 1em 0;
 }
 
-/* line 76, ../../sass/_launch.scss */
+/* line 75, ../../sass/_launch.scss */
 .bb-octocat {
   float: right;
   margin: 3em 0 0 1em;
   max-width: 290px;
 }
 
-/* line 83, ../../sass/_launch.scss */
+/* line 82, ../../sass/_launch.scss */
 #mc_embed_signup {
   clear: left;
   font-family: Helvetica, Arial, sans-serif;
 }
-/* line 87, ../../sass/_launch.scss */
+/* line 86, ../../sass/_launch.scss */
 #mc_embed_signup label {
   text-indent: -9999px;
   display: block;
   height: 0;
 }
 
-/* line 94, ../../sass/_launch.scss */
+/* line 93, ../../sass/_launch.scss */
 #mce-EMAIL {
   padding: 0.5em;
   font-size: 1.5em;
@@ -1517,7 +1518,7 @@ section {
   border-radius: 2px;
 }
 
-/* line 101, ../../sass/_launch.scss */
+/* line 100, ../../sass/_launch.scss */
 #mc-embedded-subscribe {
   color: #f1f1f1;
   padding: 0.5em;
@@ -1534,13 +1535,13 @@ section {
   -moz-box-shadow: inset 0 10px 10px -10px #777777;
   box-shadow: inset 0 10px 10px -10px #777777;
 }
-/* line 111, ../../sass/_launch.scss */
+/* line 110, ../../sass/_launch.scss */
 #mc-embedded-subscribe:hover {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 114, ../../sass/_launch.scss */
+/* line 113, ../../sass/_launch.scss */
 #mc-embedded-subscribe:active {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
@@ -1548,52 +1549,52 @@ section {
   background-color: #262626;
 }
 
-/* line 120, ../../sass/_launch.scss */
+/* line 119, ../../sass/_launch.scss */
 .theme-thumbs {
   text-align: center;
   margin-top: 3em;
 }
-/* line 124, ../../sass/_launch.scss */
+/* line 123, ../../sass/_launch.scss */
 .theme-thumbs img {
   margin: 2em 1em;
 }
 
-/* line 131, ../../sass/_launch.scss */
+/* line 130, ../../sass/_launch.scss */
 .bwb-container {
   margin-bottom: 1em;
 }
 
-/* line 134, ../../sass/_launch.scss */
+/* line 133, ../../sass/_launch.scss */
 .bwb-item {
   float: left;
   width: 31%;
   margin: 0 1%;
 }
-/* line 139, ../../sass/_launch.scss */
+/* line 138, ../../sass/_launch.scss */
 .bwb-item .btn-primary {
   margin-top: 14px;
 }
 
-/* line 143, ../../sass/_launch.scss */
+/* line 142, ../../sass/_launch.scss */
 .bwb-book-link {
   float: left;
   display: block;
   margin-right: 1em;
 }
 
-/* line 148, ../../sass/_launch.scss */
+/* line 147, ../../sass/_launch.scss */
 .bwb-book {
   width: 80px;
   height: auto;
 }
 
-/* line 153, ../../sass/_launch.scss */
+/* line 152, ../../sass/_launch.scss */
 .bwb-title {
   text-align: center;
   font-size: 1.4em;
 }
 
-/* line 157, ../../sass/_launch.scss */
+/* line 156, ../../sass/_launch.scss */
 .bwb-author {
   margin: 0 0 0 4px;
 }
