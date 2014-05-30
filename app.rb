@@ -755,7 +755,7 @@ helpers do
   # Provide the Log-in or Log-out link, depending on the current login status.
   def login_link
     if !authenticated?
-      link = '<li><a href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=' + CLIENT_ID + '">Log in</a></li>'
+      link = '<li><a href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=' + CLIENT_ID + '">Log in with Github</a></li>'
     else
       link = '<li><a href="/logout">Log out</a></li>'
     end

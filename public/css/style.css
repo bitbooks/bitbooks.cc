@@ -1599,6 +1599,11 @@ section {
   margin: 0 0 0 4px;
 }
 
+/* line 160, ../../sass/_launch.scss */
+.how-to-vid {
+  float: right;
+}
+
 /* line 3, ../../sass/_book_forms.scss */
 .book-form .error input {
   border: 1px solid red;
