@@ -762,8 +762,6 @@ helpers do
   end
 
   # Github helpers getting repo-specific data
-  # @todo: Build error handling into these, in the case that a repo doesn't exist
-  #        (like it is still being cloned over).
   def get_repo_name(full_name)
     repo_name = client.repository(full_name).name
   rescue Octokit::NotFound

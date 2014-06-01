@@ -1,7 +1,7 @@
 <%# views/posts/my_books.erb %>
 <section class="main my-books">
   <div class="inside">
- 
+
     <%= styled_flash %>
 
     <h1 class="my-books-title">My Books</h1>
@@ -12,9 +12,12 @@
         <li class="book">
           <div class="book-titlebar clearfix">
             <a class="btn" href="/books/<%= book.id %>"><span class="btn-icon icon-cog"></span>Book Settings</a>
-            <!-- <a class="btn" href="/books/<%= book.id %>"><span class="btn-icon icon-pencil"></span>Change Details</a> -->
-            <%# The link to prose doesn't require login, which is currently an issue, because of this bug: https://github.com/prose/prose/issues/643. Once it's fixed, I think the workflow will be ok. %>
-            <a class="btn" href="http://prose.io/#<%=h book.gh_full_name %>"><!--<div class="icon-prose"></div>--><span class="btn-icon icon-pencil"></span>Edit Book with Prose</a>
+
+            <%# The link to prose doesn't require login, which is currently an issue, because of this bug: https://github.com/prose/prose/issues/643. Once it's fixed, I think the workflow will be ok.%>
+            <!--
+            <a class="btn" href="http://prose.io/#<%=h book.gh_full_name %>"><span class="btn-icon icon-pencil"></span>Edit Book with Prose</a>
+            -->
+
           </div>
           <div class="book-settings clearfix">
             <div class="book-info clearfix">
