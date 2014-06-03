@@ -203,14 +203,14 @@ get "/about" do
   erb :"templates/about"
 end
 
-# Sidekiq example
- get "/sidekiq-test" do
-  stats = Sidekiq::Stats.new
-  @failed = stats.failed
-  @processed = stats.processed
-  @messages = $redis.lrange('sinkiq-example-messages', 0, -1)
-  erb :"templates/sidekiq"
-end
+# @todo: one day, set this up as another way to monitor jobs in the queue.
+# get "/admin/activity" do
+#  stats = Sidekiq::Stats.new
+#  @failed = stats.failed
+#  @processed = stats.processed
+#  @messages = $redis.lrange('sinkiq-example-messages', 0, -1)
+#  erb :"templates/sidekiq"
+# end
 
 # Styleguide
 get "/styleguide" do
