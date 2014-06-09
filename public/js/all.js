@@ -52,6 +52,13 @@ function checkForGithubPagesBranch() {
   }
 }
 
+// Enable the selectize plugin (for github select box). Commented out until I
+// can reproduce the validation and warning messages that go with it.
+//
+//$(function() {
+//    $('#select_gh_project').selectize();
+//});
+
 // This tiny function clears out the "Other License" fields on submission if
 // the "Other License" radio wasn't checked.
 function checkLicense() {

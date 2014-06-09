@@ -12,7 +12,6 @@ gem "rest-client"
 gem "json"
 gem "octokit", "~> 2.0"
 gem "sidekiq"
-gem "sidekiq-limit_fetch"
 gem "redis"
 gem "attr_encrypted"
 

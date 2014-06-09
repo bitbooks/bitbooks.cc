@@ -95,14 +95,10 @@ $redis = Redis.new
 
 class BuildWorker
   include Sidekiq::Worker
-  sidekiq_options :queue => :build
 
   # require 'pry'
 
   # Define the action that we want the worker to do.
-  # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
-  # @todo: stop passing tokens like this. It stores them unencrypted in the redis db!
-  # We can't reach the session token for the same reason that we can't reach instance variables.
   def perform(book_id)
     # We are sending the book's unique data (the contents of book.yml)
     # over in a post request. This will be used to build the book.
@@ -120,7 +116,7 @@ class BuildWorker
     ).execute
 
     # Throw in a message, for testing purposes.
-    $redis.lpush('sinkiq-example-messages', response)
+    # $redis.lpush('sinkiq-example-messages', response)
   end
 end
 
@@ -130,7 +126,6 @@ class CopyWorker
   # require 'pry-remote'
 
   # Define the action that we want the worker to do.
-  # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
   def perform(book_id)
     # We are sending the book's unique data (the contents of book.yml)
     # over in a post request. This will be used to build the book.
@@ -472,7 +467,7 @@ put "/books/:id" do
     # Queue this book rebuild with sidekiq.
     BuildWorker.perform_async(@book.id)
 
-    flash[:success] = "Your changes have been made."
+    flash[:success] = "Your changes have been made. It may take a few minutes before they are visible online."
     redirect "/my-books"
   else
     flash[:warning] = "Oops. Something went wrong. Try again."
