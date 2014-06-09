@@ -655,7 +655,9 @@ def client
   else
     user = User.find_by(github_id: session[:github_id])
     if Octokit.validate_credentials({ :access_token => user.token })
-      @client = Octokit::Client.new :access_token => user.token
+      # Auto paginate to prevent repo-list truncation on the books/new page. This may
+      # hurt performance, so keep an eye on it.
+      @client = Octokit::Client.new :access_token => user.token, :auto_paginate => true
     else
       authenticate!
     end
