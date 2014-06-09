@@ -1,0 +1,9 @@
+# For setting sidekiq advanced options.
+# See https://github.com/mperham/sidekiq/wiki/Advanced-Options
+:concurrency: 26 # The default value made explicit.
+:queues:
+  - [default, 1]  # For all non-build jobs.
+  - [build, 1] # For middleman site builds.
+:limits:
+  build: 1  # Restricted, since I don't think this job supports concurrency.
+  default: 25  # = concurrency value - # allocated to 'build' queue.

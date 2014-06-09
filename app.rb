@@ -81,7 +81,7 @@ end
 # Example: https://github.com/mperham/sidekiq/blob/master/examples/sinkiq.rb
 ######################################
 
-# For this to work ake sure you have Sinatra installed, and redis installed
+# For this to work make sure you have Sinatra installed, and redis installed
 # (see http://stackoverflow.com/a/13635955/1154642). Start redis with:
 #
 #   redis-server
@@ -95,8 +95,9 @@ $redis = Redis.new
 
 class BuildWorker
   include Sidekiq::Worker
+  sidekiq_options :queue => :build
 
-  # require 'pry-remote'
+  # require 'pry'
 
   # Define the action that we want the worker to do.
   # @todo: Password protect this request (stored as an ENV variable). Basic Auth?
@@ -411,6 +412,8 @@ post "/books" do
 
     if @book.save
       # Queue jobs for the book.
+      flash[:success] = "Your site is being built! It may take a few minutes before it is available."
+
       if cloned
         CopyWorker.perform_async(@book.id)
       else
@@ -418,7 +421,6 @@ post "/books" do
         create_commit_hook(@book.id)
       end
 
-      flash[:success] = "Your site is being built! It may take a few minutes before it is available."
       redirect "/my-books"
     else
       flash[:warning] = "Oops. Something went wrong and your site was not created. Please try again."
@@ -590,7 +592,7 @@ def create_commit_hook(book_id)
     begin
       hook = client.create_hook(book.gh_full_name, 'bitbooks', config, options)
       book.update(hook_id: hook.id)
-      flash[:info] = 'Your site will now be updated automatically, with each new commit.'
+      flash[:success] = 'Your site will be updated automatically, with each new commit.'
       return true
     rescue Octokit::UnprocessableEntity # Commit hook already exists
       flash[:info] = 'Your site will not be auto-updated with each commit.'
