@@ -702,13 +702,6 @@ def get_qualifying_repos
   # Iterate through our array of github repos and delete ones from the list
   # that don't qualify for a new book-site.
   repos.delete_if do |repo|
-    # First, while we're looping, add a method (and value) to each repo, for later use.
-    repo.class.module_eval { attr_accessor :has_gh_pages? }
-    if branch_exists?('gh-pages', repo.full_name)
-      repo.has_gh_pages = true
-    else
-      repo.has_gh_pages = false
-    end
     # Remove this repo if it matches the name for a user/org page project.
     if repo.name == name_match_1 || repo.name == name_match_2
       true
@@ -721,7 +714,16 @@ def get_qualifying_repos
       true
     else
       # This repo is good... don't delete it.
-      false
+
+      # Add a gh-pages flag method (and value) to each repo, for later use.
+      repo.class.module_eval { attr_accessor :has_gh_pages? }
+      if branch_exists?('gh-pages', repo.full_name)
+        repo.has_gh_pages = true
+      else
+        repo.has_gh_pages = false
+      end
+
+      false # End loop. Return false says "don't delete the repo".
     end
   end
 

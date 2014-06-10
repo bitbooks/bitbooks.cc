@@ -28,7 +28,7 @@
             <label for="select_gh_project" class="select-gh-label">Github Project:</label>
             <select name="book[gh_full_name]" id="select_gh_project">
               <% @repos.each do |repo| %>
-                <option data-gh-pages="<%=h repo.has_gh_pages %>" value="<%=h repo.full_name %>"><%=h repo.name %></option>
+                <option data-gh-pages="<%= repo.has_gh_pages %>" value="<%= repo.full_name %>"><%= repo.name %></option>
               <% end %>
             </select>
           </div>
