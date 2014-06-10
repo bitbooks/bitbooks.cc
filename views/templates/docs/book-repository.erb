@@ -1,0 +1,46 @@
+<section class="main docs docs-book-repository">
+  <div class="inside">
+    <h1>The Book Repository</h1>
+
+    <h2>What goes in your book repository?</h2>
+
+    <p>Three things:</p>
+
+    <ol>
+    <li>The front page (<code>index.md</code>)</li>
+    <li>Additional pages (<code>xxxxxxxx.md</code>)</li>
+    <li>Images (<code>images/</code>)</li>
+    </ol>
+
+    <p>Let's look more closely at each one:</p>
+
+    <ol>
+    <li><p>There <strong>must</strong> be a page named <code>index.md</code>, which will be used to make the front page of your book. Each additional page is represented by a separate <code>.md</code> file and can be named whatever you please.</p></li>
+    <li><p>Each page (including the front page) should begin with a heading (represented in markdown by <code># Title</code>). This heading will be used to lable the page in the book's table of contents. If you do not have a heading on the page, Bitbooks will use the filename to generate this information.</p></li>
+    <li><p>If you want to put images in your book, we recommend that you upload your images to an <code>images</code> folder for referencing within your book's pages. An example of how to do this can be found on the <a href="1-first-page.md">first page</a>.</p></li>
+    </ol>
+
+    <h2>Writing with Markdown</h2>
+
+    <p><strong>The content of all pages should be written in Markdown.</strong></p>
+
+    <p>Markdown is a simple format for writing on the web. Markdown content is written with a text editor and saved as files named like <code>filename.md</code> (or alternatively <code>filename.markdown</code>). If you are unfamiliar with markdown, here are some <a href="https://help.github.com/articles/markdown-basics">basic instructions for getting started</a>. Bitbooks uses <a href="https://help.github.com/articles/github-flavored-markdown">Github Flavored Markdown</a>, as its standard.</p>
+
+    <h2>Directory Structure</h2>
+
+    <p>Bitbooks makes very few assumptions about how your repository should be structured. You can create a flat list of markdown files, or you can choose to use directories to organize your book content, (see our <a href="https://github.com/bitbooks/example-book">example book</a> for, well, an example).</p>
+
+    <p>The structure of your Bitbooks site will mimic the structure of this repository, with two exceptions:</p>
+
+    <ol>
+    <li>Your front page (<code>index.md</code>) will be promoted to the top of the list.</li>
+    <li>Your readme (<code>readme.md</code>) and images folder will not appear in your table of contents.</li>
+    </ol>
+
+    <p>Here are a few example directory structures, with the resulting impact on book navigation and urls:</p>
+
+    <p><img src="/images/example-directories.png" alt="Example Directory Structures" title="" /></p>
+
+    <p>You may have noticed that page order is defined by alphebetical sorting of the filename. For this reason, we usually recommend prepending filenames with numbers for sorting purposes. Finally, if you have any non-markdown files in your repository (meaning, files not ending with <code>.md</code> or <code>.markdown</code>), they will not appear on the site.</p>
+  </div>
+</section>

@@ -213,6 +213,10 @@ get "/styleguide" do
   erb :"templates/styleguide"
 end
 
+get "/docs/book-repository" do
+  erb :"templates/docs/book-repository"
+end
+
 # Logout link
 get '/logout' do
   session.clear
