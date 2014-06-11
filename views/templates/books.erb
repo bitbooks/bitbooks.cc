@@ -1,10 +1,10 @@
-<%# views/posts/my_books.erb %>
-<section class="main my-books">
+<%# views/posts/books.erb %>
+<section class="main books">
   <div class="inside">
 
     <%= styled_flash %>
 
-    <h1 class="my-books-title">My Books</h1>
+    <h1 class="books-title">My Books</h1>
     <div class="inset-panel">
       <a class="btn btn-contrast add-a-book-main" href="/books/new"><span class="btn-icon icon-plus"></span>Create a new Book</a>
       <ul>
@@ -37,7 +37,7 @@
                 <div class="project-url">
                   <a class="label" href="<%=h book.github_url %>"><%= get_repo_name(book.gh_full_name) %></a>
                 </div>
-                <% if !book.github_id.nil? %>
+                <% if !book.repo_id.nil? %>
                   <ul class="repo-stats">
                     <li><a href="<%=h book.github_url %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name) %></a></li>
                     <li><a href="<%=h book.github_url %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name) %></a></li>

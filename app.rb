@@ -224,7 +224,7 @@ get '/logout' do
 end
 
 # User landing page
-get "/my-books" do
+get "/books" do
   if !authenticated?; authenticate!; end
 
   user = User.find_by(github_id: client.user.id)
@@ -237,7 +237,7 @@ get "/my-books" do
   end
 
   # End test
-  erb :"templates/my_books"
+  erb :"templates/books"
 end
 
 # A form for adding a new book.
@@ -246,9 +246,7 @@ get "/books/new" do
 
   # Get data for this page.
   @repos = get_qualifying_repos
-  @title = "Add a New Book"
-  @book = Book.new
-  @username = client.user.login
+  @title = "Create a New Book | Bitbooks"
   erb :"templates/new-book"
 end
 
@@ -260,7 +258,7 @@ get "/books/:id" do
   # Get data for this page.
   user = User.find_by(github_id: client.user.id)
   @book = Book.find(params[:id])
-  @title = "Change Book Details"
+  @title = "Change Book Details | Bitbooks"
 
   # Only the creator of this book should be able to see this page.
   if @book.user_id != user.id
@@ -278,7 +276,7 @@ get "/books/:id/domain" do
   # Get data for this page.
   user = User.find_by(github_id: client.user.id)
   @book = Book.find(params[:id])
-  @title = "Add a Custom Domain"
+  @title = "Add a Custom Domain | Bitbooks"
 
   # Only the creator of this book should be able to see this page.
   if @book.user_id != user.id
@@ -332,8 +330,8 @@ get '/callback' do
     update_user_info(github)
   end
 
-  # As soon as anybody authenticates, we kick them to "my-books".
-  redirect '/my-books'
+  # As soon as anybody authenticates, we kick them to "/books".
+  redirect '/books'
 end
 
 # Define other API behaviors
@@ -351,7 +349,7 @@ end
 
 # The New Book form sends a POST request (storing data) here
 # where we try to create the book it sent in its params hash.
-# If successful, redirect to "my-books". Otherwise, render the "posts/new"
+# If successful, redirect to "/books". Otherwise, render the "posts/new"
 # template where the @post object will have the incomplete data that the
 # user can modify and resubmit.
 post "/books" do
@@ -391,7 +389,7 @@ post "/books" do
     # Assign any data we want in our database to our POST params. We save them to
     # the params (instead of to the book object), in order to overwrite any erroneous
     # post data that anybody could inject:
-    params[:book]["github_id"] = client.repository(full_name).id unless cloned # The github repo ID
+    params[:book]["repo_id"] = client.repository(full_name).id unless cloned # The github repo ID
     params[:book]["user_id"] = current_user.id
     params[:book]["github_url"] = "https://github.com/" + full_name
     params[:book]["github_pages_url"] = "http://" + username.downcase + ".github.io/" + full_name.split('/')[1]
@@ -420,7 +418,7 @@ post "/books" do
         create_commit_hook(@book.id)
       end
 
-      redirect "/my-books"
+      redirect "/books"
     else
       flash[:warning] = "Oops. Something went wrong and your site was not created. Please try again."
       redirect "/books/new"
@@ -429,7 +427,7 @@ post "/books" do
 end
 
 # The Edit Book form sends a PUT request (updating data) here.
-# If the book is updated successfully, redirect to "my-books". Otherwise,
+# If the book is updated successfully, redirect to "/books". Otherwise,
 # render the edit form again with the failed @post object still in memory
 # so they can retry.
 #
@@ -441,16 +439,16 @@ put "/books/:id" do
 
   # Get relevant book data.
   user = User.find_by(github_id: client.user.id)
-  @book = Book.find(params[:id])
+  @book = Book.find(params[:id]) # @todo: I don't think this needs to be a class variable.
 
   # Users can only update their own books.
   if @book.user_id != user.id
     flash[:warning] = "Your changes could not be made because you do not have access to this book."
-    redirect "/my-books"
+    redirect "/books"
   end
 
   # Don't allow users to update "protected" properties, including:
-  protected_properties = ["id", "gh_full_name", "github_pages_url", "github_url", "created_at", "updated_at", "user_id", "github_id"]
+  protected_properties = ["id", "gh_full_name", "github_pages_url", "github_url", "created_at", "updated_at", "user_id", "repo_id"]
   protected_properties.each do |property|
     if params[:book][property]
       params[:book].delete(property)
@@ -472,7 +470,7 @@ put "/books/:id" do
     BuildWorker.perform_async(@book.id)
 
     flash[:success] = "Your changes have been made. It may take a few minutes before they are visible online."
-    redirect "/my-books"
+    redirect "/books"
   else
     flash[:warning] = "Oops. Something went wrong. Try again."
     redirect "/books/#{params[:id]}/edit"
@@ -512,9 +510,9 @@ end
 # http://williamdurand.fr/2014/02/14/please-do-not-patch-like-an-idiot/
 post "/books/:id/repo-id" do
   protected!
-  github_id = session[:github_id] = params[:data][:github_id]
+  session[:github_id] = params[:data][:github_id]
   book = Book.find(params[:id])
-  book.update(github_id: github_id)
+  book.update(repo_id: params[:data][:repo_id])
   create_commit_hook(params[:id])
 end
 
@@ -538,7 +536,7 @@ delete "/books/:id" do
   # Users can only delete their own books.
   if book.user_id != user.id
     flash[:warning] = "The site could not be deleted because you do not have access to this book."
-    redirect "/my-books"
+    redirect "/books"
   end
 
   # Delete the site.
@@ -547,7 +545,7 @@ delete "/books/:id" do
   book.destroy
 
   flash[:success] = "Your book site has been deleted."
-  redirect "/my-books"
+  redirect "/books"
 end
 
 ######################################
@@ -557,8 +555,8 @@ end
 def create_new_user(github)
   user = User.new
   user.github_id = github.user.id
-  user.username = github.user.login
   user.email = github.user.email
+  user.plan = 'basic'
   user.created_at = Time.now
   user.updated_at = Time.now
   user.token = github.access_token
@@ -568,7 +566,6 @@ end
 
 def update_user_info(github)
   user = User.find_by(github_id: session[:github_id])
-  user.username = github.user.login unless user.username == github.user.login
   user.email = github.user.email unless user.email == github.user.email
   user.token = github.access_token unless user.token == github.access_token
   user.updated_at = Time.now
@@ -741,13 +738,11 @@ end
 
 # These helpers can be used in my layouts or templates
 helpers do
-  # If @title is assigned, add it to the page's title.
+
+  # Each page should define its own title, or it will get this default one.
+  # @todo: Add titles for all pages missing them.
   def title
-    if @title
-      "#{@title} -- My Books"
-    else
-      "My Books"
-    end
+    @title ||= "Bitbooks | Build Online Books from Github"
   end
 
   # A tiny helper for deleting a book.

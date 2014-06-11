@@ -1,4 +1,4 @@
-.my-books {
+.books {
 
   .book {
     background-color: $bb-light;
@@ -45,7 +45,7 @@
 
 }
 
-.my-books-title {
+.books-title {
   margin-bottom: 16px;
 }
 
@@ -55,11 +55,11 @@
   margin-top: 0;
   padding: 1em 1em 0;
   border-bottom: 1px solid #fff;
-  -moz-box-shadow: inset 0 1px 6px -3px #000;    
-  -webkit-box-shadow: inset 0 1px 6px -3px #000;    
+  -moz-box-shadow: inset 0 1px 6px -3px #000;
+  -webkit-box-shadow: inset 0 1px 6px -3px #000;
   box-shadow: inset 0 1px 6px -3px #000;
   border-radius: 2px;
-  
+
   ul {
     padding: 0;
     margin: 0;
@@ -90,7 +90,7 @@
       box-shadow: inset 0px 1px 1px #999, 0px 1px 0 #fff;
     }
   }
-  
+
   // Adjustments to headings that are on the title bar
   h2,
   h3 {
@@ -152,7 +152,7 @@ a:hover .book-cover {
   float: left;
   width: 30%;
   font-family: $droid-sans;
-  
+
   .label {
     font-weight: bold;
   }
@@ -206,7 +206,7 @@ a:hover .book-cover {
   }
   .pull-requests:hover #svg2 {
     fill: $bb-orange;
-  }  
+  }
 }
 
 .project-url {
