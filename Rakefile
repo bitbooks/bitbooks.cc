@@ -6,9 +6,9 @@
 # however, deploying them uncommented causes the Invalid DATABASE_URL errors
 # to appear (though the deployment still seems to work). It's probably best
 # to leave them commented unless I'm doing migrations.
-# require 'sidekiq'
-# require 'sidekiq/web'
-# require 'redis'
-# require './app'
+ require 'sidekiq'
+ require 'sidekiq/web'
+ require 'redis'
+ require './app'
 
 require 'sinatra/activerecord/rake' # Defines migration tasks.
