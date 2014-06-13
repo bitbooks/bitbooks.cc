@@ -12,6 +12,16 @@ require 'attr_encrypted'
 # for pretty print debugging
 require 'pp'
 
+# An example for profiling:
+# require 'profiler'
+# get "/profile" do
+  # Profiler__.start_profile
+  #  # Put methods here.
+  # Profiler__.stop_profile
+  # Profiler__.print_profile(STDOUT)
+  # end
+# End Profiling Code
+
 # Environment Variables (with dummy placeholders)
 CLIENT_ID = ENV['GH_BASIC_CLIENT_ID'] || '12345'
 CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID'] || '12345'
@@ -199,15 +209,6 @@ get "/about" do
   erb :"templates/about"
 end
 
-# @todo: one day, set this up as another way to monitor jobs in the queue.
-# get "/admin/activity" do
-#  stats = Sidekiq::Stats.new
-#  @failed = stats.failed
-#  @processed = stats.processed
-#  @messages = $redis.lrange('sinkiq-example-messages', 0, -1)
-#  erb :"templates/sidekiq"
-# end
-
 # Styleguide
 get "/styleguide" do
   erb :"templates/styleguide"
@@ -334,7 +335,19 @@ get '/callback' do
   redirect '/books'
 end
 
-# Define other API behaviors
+# Admin pages.
+
+# @todo: one day, set this up as another way to monitor jobs in the queue.
+# get "/admin/activity" do
+#  stats = Sidekiq::Stats.new
+#  @failed = stats.failed
+#  @processed = stats.processed
+#  @messages = $redis.lrange('sinkiq-example-messages', 0, -1)
+#  erb :"templates/sidekiq"
+# end
+
+
+# Define other API behaviors.
 #
 # Reminder: Restful HTTP Verbs
 # - GET, (list records)
@@ -683,6 +696,7 @@ def get_qualifying_repos
   end
 
   # Get Github data.
+
   repos = client.repositories
   username = client.user.login
 
@@ -714,17 +728,8 @@ def get_qualifying_repos
     elsif username != repo.full_name.split('/')[0]
       true
     else
-      # This repo is good... don't delete it.
-
-      # Add a gh-pages flag method (and value) to each repo, for later use.
-      repo.class.module_eval { attr_accessor :has_gh_pages? }
-      if branch_exists?('gh-pages', repo.full_name)
-        repo.has_gh_pages = true
-      else
-        repo.has_gh_pages = false
-      end
-
-      false # End loop. Return false says "don't delete the repo".
+      # This repo is good... return false to prevent deleting it.
+      false
     end
   end
 

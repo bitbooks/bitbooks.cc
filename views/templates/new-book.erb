@@ -28,12 +28,12 @@
             <label for="select_gh_project" class="select-gh-label">Github Project:</label>
             <select name="book[gh_full_name]" id="select_gh_project">
               <% @repos.each do |repo| %>
-                <option data-gh-pages="<%= repo.has_gh_pages %>" value="<%= repo.full_name %>"><%= repo.name %></option>
+                <option value="<%= repo.full_name %>"><%= repo.name %></option>
               <% end %>
             </select>
           </div>
           <div class="form-item clearfix">
-            <input type="button" name="next" class="next btn btn-primary" value="Next" />
+            <input type="button" name="next" class="next btn btn-primary" id="section-1-next" value="Next" />
           </div>
         </fieldset>
         <fieldset>
@@ -49,8 +49,8 @@
             <div class="msg author-msg"></div>
           </div>
           <div class="form-item clearfix">
-            <input type="button" name="previous" class="previous btn btn-primary" value="Previous" />
-            <input type="button" name="next" class="next btn btn-primary" value="Next" />
+            <input type="button" name="previous" class="previous btn btn-primary" id="section-2-previous" value="Previous" />
+            <input type="button" name="next" class="next btn btn-primary" id="section-2-next" value="Next" />
           </div>
         </fieldset>
         <fieldset>
@@ -80,12 +80,13 @@
             </div>
           </div>
           <div class="form-item clearfix">
-            <input type="button" name="previous" class="previous btn btn-primary" value="Previous" />
-            <input type="button" name="next" class="next btn btn-primary" value="Next" />
+            <input type="button" name="previous" class="previous btn btn-primary" id="section-3-previous" value="Previous" />
+            <input type="button" name="next" class="next btn btn-primary" id="section-3-next" value="Next" />
           </div>
         </fieldset>
         <fieldset>
           <h2>Choose a Theme</h2>
+          <p>You can always change this later.</p>
           <label for="selected-theme" class="required">Theme:</label><br />
           <div class="form-item theme-options clearfix">
             <img src="/images/theme-glide-thumb.png" data-value="Glide" class="highlighted"/>
@@ -94,10 +95,9 @@
             <!-- see http://stackoverflow.com/questions/4178516/highlight-selected-image-in-form-with-jquery, on setting this up -->
             <input type="hidden" id="selected_theme" name="book[theme]" value="Glide" >
           </div>
-          <p>You can always change this later.</p>
           <div class="form-item clearfix">
-            <input type="button" name="previous" class="btn btn-primary previous" value="Previous" />
-            <input class="btn btn-action right" type="submit" value="Build my Site" onclick="checkLicense()" /><br />
+            <input type="button" name="previous" class="btn btn-primary previous" id="section-4-previous" value="Previous" />
+            <input class="btn btn-action right" id="new-book-submit" type="submit" value="Build my Site" /><br />
           </div>
         </fieldset>
         <div class="required-notice"><small>* Required</small></div>

@@ -1,4 +1,5 @@
 // A temporary Hackaroni-and-cheese version. Later we should replace this with Backbone or something.
+// @todo: Get this stuff in a Document.ready method, so it doesn't have to depend on being loaded after the DOM.
 
 // Behaviors for selecting a theme (See http://stackoverflow.com/questions/4178516).
 if($('.theme-options').length !== 0) {
@@ -45,11 +46,27 @@ $('#select_gh_project').change(function(e) {
 });
 
 function checkForGithubPagesBranch() {
-  var gh_pages_exists = $('#select_gh_project option:selected').data('gh-pages');
-  if (gh_pages_exists === true) {
-    var warning = '<div class="flash warning github-warning"><b>WAIT!</b> This project already has a gh-pages branch. If you build a book-site for this project, it will overwrite the contents of your existing Github pages site! <i>Consider yourself warned!</i></div>';
-    $('#select_gh_project').after(warning);
-  }
+  var gh_full_name = $('#select_gh_project option:selected').val();
+
+  $.ajax({
+    url: "https://api.github.com/repos/" + gh_full_name + "/branches/gh-pages",
+    dataType: "json",
+    // Returns "success" if the gh-pages branch exists, and "error" (404) if it doesn't.
+    success: function (returndata) {
+      var warning = '<div class="flash warning github-warning"><b>WAIT!</b> This project already has a gh-pages branch. If you build a book-site for this project, it will overwrite the contents of your existing Github pages site! <i>Consider yourself warned!</i></div>';
+      $('#select_gh_project').after(warning);
+      $('.theme-options').after(warning);
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown) {
+      // If the API is down or we otherwise cannot tell if a github pages branch exists,
+      // we provide a message out of an abundance of caution.
+      if (errorThrown !== "Not Found") { // It returned a non-404 error.
+        var safemessage = '<div class="flash warning github-warning">Heads up! If this project has a github pages branch it will be overwritten.</div>';
+        $('#select_gh_project').after(safemessage);
+        $('.theme-options').after(safemessage);
+      }
+    }
+  });
 }
 
 // Enable the selectize plugin (for github select box). Commented out until I
@@ -59,14 +76,14 @@ function checkForGithubPagesBranch() {
 //    $('#select_gh_project').selectize();
 //});
 
-// This tiny function clears out the "Other License" fields on submission if
+// This clears out the "Other License" fields when paginating if
 // the "Other License" radio wasn't checked.
-function checkLicense() {
+$('#section-3-next').click(function(event){
   if(!$('#other').is(':checked')) {
     $('.other-options input').val('');
   }
   return true;
-}
+});
 
 // This function checks to see if there are any required, unfilled,
 // fields on the page, and creates error messages for them. Good
@@ -219,8 +236,6 @@ $(".previous").click(function(){
     easing: 'swing'
   });
 });
-
-
 
 // Behaviors on the domain page, including ajax form submission and undo request.
 
