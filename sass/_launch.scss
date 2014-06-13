@@ -132,21 +132,22 @@
 }
 .bwb-item {
   float: left;
-  width: 31%;
+  width: 48%;
   margin: 0 1%;
+  text-align: center;
 
   .btn-primary {
     margin-top: 14px;
   }
 }
 .bwb-book-link {
-  float: left;
-  display: block;
+  display: inline-block;
+  vertical-align: top;
   margin-right: 1em;
 }
 .bwb-book {
   // Remove size restrictions, once we pull in GH stars, data, etc.)
-  width: 80px;
+  width: 100px;
   height: auto;
 }
 .bwb-title {
@@ -155,6 +156,10 @@
 }
 .bwb-author {
   margin: 0 0 0 4px;
+}
+.bwb-info {
+  display: inline-block;
+  vertical-align: top;
 }
 
 .how-to-vid {
