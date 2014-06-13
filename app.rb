@@ -384,7 +384,7 @@ post "/books" do
     redirect "/books/new"
   else
     # Assign values for cloned books.
-    full_name = params[:book]["gh_full_name"] = username + '/starter-book' if cloned
+    full_name = params[:book]["gh_full_name"] = get_cloned_book_fullname(username) if cloned
     params[:book].delete("source") # No need to store this.
 
     # Prevent back-button duplicate book submission.
@@ -621,11 +621,21 @@ def delete_branch(github_full_name)
   end
 end
 
-# @todo: See if this is helpful it's from copy-to, but I haven't integrated it yet.
 def repo_exists?(gh_full_name)
   client.repository gh_full_name
 rescue Octokit::NotFound
   false
+end
+
+def get_cloned_book_fullname(username)
+  name_candidate = username + '/starter-book'
+  attempt = 0
+  while repo_exists?(name_candidate)
+    name_candidate = name_candidate + '-0' if attempt == 0
+    name_candidate.succ!
+    attempt += 1;
+  end
+  return name_candidate
 end
 
 # This function is a more atomic way to delete hooks, but it hits the database
