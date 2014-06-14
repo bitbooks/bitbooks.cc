@@ -293,6 +293,12 @@ not_found do
   erb :"templates/404"
 end
 
+# This is triggered when the database calls a non-existant row. It was added
+# to handle get "/book/999999999" and other requests.
+error ActiveRecord::RecordNotFound do
+  status 404
+  erb :"templates/404"
+end
 
 # Callback URL for Github Authentication. This gets a github oauth token for me
 # for use in acquiring API data. It runs every time a person uses "Log in
@@ -504,15 +510,21 @@ post "/books/:id/build" do
   if header_sha != local_sha
     status 401 # unauthorized
   else
-    push = JSON.parse(body)
+    book_id = params[:id]
+    push_data = JSON.parse(body)
 
-    # Github's initial 'ping' request (which is sent when a commit hook is created)
-    # chokes if we try to build a book with data it doesn't contain, so we only do
-    # a build if there is a 'repository' key. Also, to prevent infinite build loops,
-    # we only do a build when a change is made to the master branch.
-    if push.key?("repository") && push["ref"] == 'refs/heads/master'
-      BuildWorker.perform_async(params[:id])
+    # If the master branch was changed (excludes Github's initial 'ping' request).
+    if push_data["ref"] == 'refs/heads/master'
+      BuildWorker.perform_async(book_id)
+    # If the gh-pages branch was deleted.
+    elsif push_data["ref"] == 'refs/heads/gh-pages' && push_data["deleted"] == true
+      # Determine the @github_id, so we can access this user's token with the session value.
+      this_user = Book.find(book_id).user_id
+      @github_id = User.find(this_user).github_id
+      delete_commit_hook(book_id)
+      Book.delete(book_id)
     end
+    status 200 # Indicates success.
   end
 end
 
@@ -677,7 +689,17 @@ def client
   if client_object_exists
     return @client
   else
-    user = User.find_by(github_id: session[:github_id])
+    # When coming through a commit hook endpoint, the github_id won't be saved
+    # in the session, so we need to be able to grab it from a class instance variable.
+    if session[:github_id] != nil
+      github_id = session[:github_id]
+    elsif @github_id != nil
+      github_id = @github_id
+    else
+      authenticate!
+    end
+
+    user = User.find_by(github_id: github_id)
     if Octokit.validate_credentials({ :access_token => user.token })
       # Auto paginate to prevent repo-list truncation on the books/new page. This may
       # hurt performance, so keep an eye on it.
@@ -780,7 +802,7 @@ helpers do
   def get_repo_name(full_name)
     repo_name = client.repository(full_name).name
   rescue Octokit::NotFound
-    "being cloned..."
+    "not available"
   end
 
   # Get github project star count
