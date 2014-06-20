@@ -7,9 +7,10 @@
       <p class="subtext">Build online books directly from Github</p>
       <img src="images/turn-this.png" />
 
-      <!-- @todo: only show "login w/github" if a person isn't logged in -->
-      <!--<p><a class="btn" href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=<%= client_id %>"><span class="btn-icon icon-github2"></span>Login with Github</a></p>-->
-      <p class="subtext"><a href="mailto:bryan@bitbooks.cc">Ask</a> to join the Private Beta.</p>
+      <% if !!(!authenticated?) %>
+        <p><a class="btn btn-large" id="main-login" href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=<%= client_id %>"><span class="btn-icon icon-github2"></span>Login with Github</a></p>
+      <% end %>
+      <!--<p class="subtext"><a href="mailto:bryan@bitbooks.cc">Ask</a> to join the Private Beta.</p>-->
       <!--End mc_embed_signup-->
     </div>
   </section>
@@ -37,7 +38,7 @@
           <a href="https://jwiegley.github.io/git-from-the-bottom-up/" class="bwb-book-link"><img class="bwb-book" src="/images/book_covers/book-green-sm.png" /></a>
           <div class="bwb-info">
             <span class="bwb-author"> by John Wiegley</span><br />
-            <a href="https://jwiegley.github.io/git-from-the-bottom-up/" class="btn btn-primary">Read the Book</a><br />
+            <a href="http://jwiegley.github.io/git-from-the-bottom-up/" class="btn btn-primary">Read the Book</a><br />
             <a href="https://github.com/jwiegley/git-from-the-bottom-up" class="btn">See it on Github</a>
           </div>
         </div>
@@ -46,7 +47,7 @@
           <a href="https://bryanbraun.github.io/tiny-book-of-rules/" class="bwb-book-link"><img class="bwb-book" src="/images/book_covers/book-red-sm.png" /></a>
           <div class="bwb-info">
             <span class="bwb-author"> by Johan Falk</span><br />
-            <a href="https://bryanbraun.github.io/tiny-book-of-rules/" class="btn btn-primary">Read the Book</a><br />
+            <a href="http://bryanbraun.github.io/tiny-book-of-rules/" class="btn btn-primary">Read the Book</a><br />
             <a href="https://github.com/bryanbraun/tiny-book-of-rules" class="btn">See it on Github</a>
           </div>
         </div>
@@ -88,6 +89,6 @@
     <div class="inside">
       <img class="bb-diff" src="images/bitbooks-diff-sm.png" />
       <h2>Why?</h2>
-      <p>We love creative commons books like <a href="http://git-scm.com/book" target="_blank">Scott Chacon's Pro Git</a>, and <a href="http://diveintohtml5.info/" target="_blank">Mark Pilgram's Dive into HTML5</a>. They are well designed. They show up in search results. They are even are available in various formats and languages. The idea behind Bitbooks is to make it easy for Developers to write and maintain a comparable online book, using Github as a collaborative writing platform.</p>
+      <p>We love creative commons books like <a href="http://git-scm.com/book" target="_blank">Scott Chacon's Pro Git</a>, and <a href="http://diveintohtml5.info/" target="_blank">Mark Pilgram's Dive into HTML5</a>. They are well designed. They show up in search results. They are available in various formats and languages. The idea behind Bitbooks is to make it easy for Developers to write and maintain books like these, using Github as a collaborative writing platform.</p>
     </div>
   </section>

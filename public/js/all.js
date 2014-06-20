@@ -46,10 +46,14 @@ $('#select_gh_project').change(function(e) {
 });
 
 function checkForGithubPagesBranch() {
-  var gh_full_name = $('#select_gh_project option:selected').val();
+  var repo_id = $('#select_gh_project option:selected').val();
 
+  // @todo: we should not depend on the error condition for normal use. I read a blog
+  // post about this. Just use a condition in the success area. I think my endpoint
+  // should actually be "https://api.github.com/repositories/" + repo_id + "/branches"
+  // in order to fix this.
   $.ajax({
-    url: "https://api.github.com/repos/" + gh_full_name + "/branches/gh-pages",
+    url: "https://api.github.com/repositories/" + repo_id + "/branches/gh-pages",
     dataType: "json",
     // Returns "success" if the gh-pages branch exists, and "error" (404) if it doesn't.
     success: function (returndata) {
@@ -78,7 +82,7 @@ function checkForGithubPagesBranch() {
 
 // This clears out the "Other License" fields when paginating if
 // the "Other License" radio wasn't checked.
-$('#section-3-next').click(function(event){
+$('#section-3-next, #edit-book-submit').click(function(event){
   if(!$('#other').is(':checked')) {
     $('.other-options input').val('');
   }

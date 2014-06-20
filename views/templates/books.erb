@@ -15,7 +15,7 @@
 
             <%# The link to prose doesn't require login, which is currently an issue, because of this bug: https://github.com/prose/prose/issues/643. Once it's fixed, I think the workflow will be ok.%>
             <!--
-            <a class="btn" href="http://prose.io/#<%=h book.gh_full_name %>"><span class="btn-icon icon-pencil"></span>Edit Book with Prose</a>
+            <a class="btn" href="http://prose.io/#<%= get_repo_full_name(book.repo_id) %>"><span class="btn-icon icon-pencil"></span>Edit Book with Prose</a>
             -->
 
           </div>
@@ -35,14 +35,15 @@
               <div class="secondary-info">
                 <h3>Github Info:</h3>
                 <div class="project-url">
-                  <a class="label" href="<%=h book.github_url %>"><%= get_repo_name(book.gh_full_name) %></a>
+                  <a class="label" href="<%= get_project_url(book) %>"><%= get_repo_name(book.repo_id) %></a>
                 </div>
                 <% if !book.repo_id.nil? %>
+                  <%# I could add a delete button here, triggered by the repo_exists? call. Usually, when the book has a repo_id, but it is not_found in the api, the repo has been deleted and the book can be deleted too. %>
                   <ul class="repo-stats">
-                    <li><a href="<%=h book.github_url %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.gh_full_name) %></a></li>
-                    <li><a href="<%=h book.github_url %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.gh_full_name) %></a></li>
-                    <li><a href="<%=h book.github_url %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.gh_full_name) %></a></li>
-                    <li><a href="<%=h book.github_url %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.gh_full_name) %></a></li>
+                    <li><a href="<%= get_project_url(book) %>/stargazers" class="icon-star linked-icon" title="Stars"><%= get_star_count(book.repo_id) %></a></li>
+                    <li><a href="<%= get_project_url(book) %>/network" class="icon-flow-branch linked-icon" title="Forks"><%= get_fork_count(book.repo_id) %></a></li>
+                    <li><a href="<%= get_project_url(book) %>/issues" class="icon-notification linked-icon" title="Open Issues"><%= get_issue_count(book.repo_id) %></a></li>
+                    <li><a href="<%= get_project_url(book) %>/pulls" class="pull-requests linked-icon" title="Open Pull Requests"><%= inline_svg('pull-request-sm.svg') %><%= get_pull_request_count(book.repo_id) %></a></li>
                   </ul>
                 <% end %>
               </div>
