@@ -10,7 +10,8 @@ gem "sinatra-activerecord"
 gem "sinatra-flash"
 gem "rest-client"
 gem "json"
-gem "octokit", path: "vendor/gems/octokit.rb" # Change this to the public version once my issue is closed: https://github.com/octokit/octokit.rb/pull/485
+# gem "octokit", path: "vendor/gems/octokit.rb" # Change this to the public version once my issue is closed: https://github.com/octokit/octokit.rb/pull/485
+gem "octokit"
 gem "sidekiq"
 gem "redis"
 gem "attr_encrypted"
