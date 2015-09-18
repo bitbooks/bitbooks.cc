@@ -1,5 +1,6 @@
 <%# views/templates/index.erb %>
   <section class="jumbotron">
+    <!--
     <div class="inside">
       <%= styled_flash %>
 
@@ -10,18 +11,25 @@
       <% if !!(!authenticated?) %>
         <p><a class="btn btn-large" id="main-login" href="https://github.com/login/oauth/authorize?scope=public_repo,admin:repo_hook&client_id=<%= client_id %>"><span class="btn-icon icon-github2"></span>Login with Github</a></p>
       <% end %>
-      <!--<p class="subtext"><a href="mailto:bryan@bitbooks.cc">Ask</a> to join the Private Beta.</p>-->
-      <!--End mc_embed_signup-->
+    </div>
+    -->
+  </section>
+  <section class="clearfix">
+    <div class="inside-narrow">
+      <p><strong>On October 8th 2015, I'll be shutting down Bitbooks for good.</strong></p>
+      <p>All good things must come to an end, and so it is with this.<p>
+      <h2>The Why</h2>
+      <p>When I began working on Bitbooks, there were basically no options for developers to publish online books with developer tools like Markdown and Github. Since then, the existing services (like <a href="https://leanpub.com">LeanPub</a> and <a href="http://liber.io/">Liberio</a>) have matured while new ones (like <a href="https://www.gitbook.com/">Gitbook</a> & <a href="https://atlas.oreilly.com/">OReily Atlas</a>) have sprung up. As these options grew, I realized that their funding and ability to iterate would provide users with a better result than I could. As a result, my motivation fell, and I began to divide my attention between competing priorities. Honestly, Bitbooks has been in a sort of maintenance mode for several months, faithfully providing it's services without receiving any updates. That isn't fair to you.</p>
+      <p>Rather than delay the inevitable, I feel it's best to close it down now, allowing me give my full attention to other projects.</p>
+      <h2>What does this mean for users?</h2>
+      <p>All books created with Bitbooks will remain safely hosted in your Github repositories. However, Bitbooks will no longer update your online book websites (on Github Pages) in response to text updates in your repo.</p>
+      <p>You have options though. With Markdown becoming ubiquitous, you can easily use your existing repo to launch your book on a different service (like <a href="https://www.gitbook.com/">Gitbook</a> or <a href="https://leanpub.com">LeanPub</a>). You may also know that the site-building tool behind Bitbooks was released as the open source project <a href="https://github.com/bryanbraun/franklin">Franklin</a>. If you have some ruby experience, you can still use Franklin to create local builds of your books and put together your own publishing workflow.</p>
+      <p>I started this project wanting to empowering developers to publish simple, attractive, books as easily as they publish code. In the 2+ the years that elapsed since then, you've used Bitbooks to create hundreds of books, in various languages, on topics ranging from technical instruction, to comic strips, to family history. It's been exciting and humbling to see it being used for things I couldn't imagine.</p>
+      <p>Thanks for joining me on the journey.</p>
+      <p><i>: Bryan</i></p>
     </div>
   </section>
-  <section class="explainer explainer-1 clearfix">
-    <div class="inside">
-      <iframe class="how-to-vid" width="420" height="315" src="//www.youtube.com/embed/NKeI5tODN0Q?rel=0&autohide=1&showinfo=0" frameborder="0" allowfullscreen></iframe>
-      <h2>How it works</h2>
-      <p>Bitbooks turns a repo full of markdown files into a handsome, hosted, online book.</p>
-      <p>Watch the one-minute video and see how easy it is to get started.</p>
-    </div>
-  </section>
+<!--
   <section class="explainer explainer-1">
     <div class="inside">
       <img class="bb-octocat" src="images/octocat_sm.png" />
@@ -51,17 +59,6 @@
             <a href="https://github.com/bryanbraun/tiny-book-of-rules" class="btn">See it on Github</a>
           </div>
         </div>
-        <!--
-        <div class="bwb-item">
-          <h3 class="bwb-title">Book Title Here</h3>
-          <a href="#" class="bwb-book-link"><img class="bwb-book" src="/images/book_covers/book-teal-sm.png" /></a>
-          <div class="bwb-info">
-            <span class="bwb-author"> by First Last</span><br />
-            <a href="#" class="btn btn-primary">Read the Book</a><br />
-            <a href="#" class="btn">See it on Github</a>
-          </div>
-        </div>
-      -->
       </div>
     </div>
   </section>
@@ -92,3 +89,4 @@
       <p>We love creative commons books like <a href="http://git-scm.com/book" target="_blank">Scott Chacon's Pro Git</a>, and <a href="http://diveintohtml5.info/" target="_blank">Mark Pilgram's Dive into HTML5</a>. They are well designed. They show up in search results. They are available in various formats and languages. The idea behind Bitbooks is to make it easy for Developers to write and maintain books like these, using Github as a collaborative writing platform.</p>
     </div>
   </section>
+-->

@@ -15,6 +15,12 @@ section {
   padding: 1em;
 }
 
+.inside-narrow {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 3em 1em;
+}
+
 // Titlebar
 .titlebar {
   background-color: #e0e0e0;
