@@ -18,6 +18,6 @@ production:
   database: db
   pool: 5
   username: root
-  password: yR8K2IpzIc7xQjLv
-  host: 172.17.42.1
+  password: XXXXXXXXXXXXXX
+  host: ###.##.##.#
   port: 49153
